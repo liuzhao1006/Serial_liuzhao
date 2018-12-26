@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">base</string>
+
+    <string name="picture">拍照</string>
+    <string name="need_permissions">该App需要打开摄像头拍照，并保存到设备上</string>
+    <string name="sorry">很抱歉，由于未被赋予相应权限，“Picture”停止运行</string>
+    <string name="failed">配置失败</string>
+    <string name="save_failed">保存失败</string>
+
+    <string name="notifyTitle">提示</string>
+    <string name="notifyMsg">当前应用缺少必要权限。\n\n请点击\"设置\"-\"权限\"-打开所需权限。</string>
+    <string name="setting">设置</string>
+    <string name="cancel">取消</string>
+</resources>

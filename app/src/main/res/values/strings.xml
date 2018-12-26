@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Serial</string>
+    <string name="tv_title">Usb连接</string>
+    <string name="tv_read_message">读取数据</string>
+    <string name="tv_write_message" >写入数据</string>
+    <string name="tv_header_message">帧头</string>
+    <string name="tv_read_write_message">读写模式</string>
+    <string name="tv_content_message">读写内容</string>
+    <string name="btn_send_one">55</string>
+    <string name="btn_send_two">17</string>
+</resources>
