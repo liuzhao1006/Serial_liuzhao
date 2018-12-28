@@ -2,10 +2,10 @@
     <string name="app_name">Serial</string>
     <string name="tv_title">Usb连接</string>
     <string name="tv_read_message">读取数据</string>
-    <string name="tv_write_message" >写入数据</string>
-    <string name="tv_header_message">帧头</string>
-    <string name="tv_read_write_message">读写模式</string>
-    <string name="tv_content_message">读写内容</string>
-    <string name="btn_send_one">55</string>
+    <string name="tv_write_message" >写入数据, 所有输入的内容均为十六进制</string>
+    <string name="tv_header_message">地址</string>
+    <string name="tv_read_write_message">读写模式 只有5种, 80,81,82,83,84</string>
+    <string name="tv_content_message">读写内容, 值</string>
+    <string name="btn_send_one">send</string>
     <string name="btn_send_two">17</string>
 </resources>

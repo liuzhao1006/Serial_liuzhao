@@ -23,6 +23,7 @@ import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
 import com.lz.base.observe.PusherMessage;
 import com.lz.base.observe.Subject;
+import com.lz.base.protocol.SyMessage;
 import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.ICallBack;
@@ -37,9 +38,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements View.OnClickListener{
 
-    private AutoCompleteTextView tvHeaderMessage;
+    private AutoCompleteTextView tvAdressMessage;
     private AutoCompleteTextView tvReadWriteMessage;
     private AutoCompleteTextView tvContentMessage;
     private ListView lvReadView;
@@ -58,13 +59,14 @@ public class MainActivity extends BaseActivity {
         initUsb();
         mTest = new Test();
         tvTitle = findViewById(R.id.tv_title);
-        tvHeaderMessage = findViewById(R.id.tv_header_message);
+        tvAdressMessage = findViewById(R.id.tv_adress_message);
         tvReadWriteMessage = findViewById(R.id.tv_read_write_message);
         tvContentMessage = findViewById(R.id.tv_content_message);
         initListView();
         initEditText();
-
-        findViewById(R.id.btn_send_one).setOnClickListener(view -> {
+        findViewById(R.id.btn_send_one).setOnClickListener(this);
+        findViewById(R.id.btn_send_two).setOnClickListener(this);
+       /* findViewById(R.id.btn_send_one).setOnClickListener(view -> {
             String msg = "5A A5 05 82 11 01 00 32";
             byte[] bytes = ConvertUtil.hexStringToBytes(msg);
             byte[] b = {(byte) 0x5A, (byte) 0XA5,
@@ -83,7 +85,7 @@ public class MainActivity extends BaseActivity {
 
             Util.showToast(ConvertUtil.bytes2String(b));
             write(b, 0, b.length);
-        });
+        });*/
 
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             if(readAdapter !=null){
@@ -100,8 +102,32 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_send_one:
+                //获取地址
+                String adress = tvAdressMessage.getText().toString().trim();
+                //需要校验一下,这里忽略
+                byte[] bAdress = ConvertUtil.hexStringToBytes(adress);
+                String order = tvReadWriteMessage.getText().toString().trim();
+                int bOrder = Integer.parseInt(order);
+                String content = tvContentMessage.getText().toString().trim();
+                byte[] bContent = ConvertUtil.hexStringToBytes(content);
+                SyMessage msg = new SyMessage(bContent);
+                msg.setAdress(bAdress);
+                msg.setOrder(bOrder);
+
+                LogUtils.i(msg.toString());
+
+                break;
+            case R.id.btn_send_two:
+                break;
+        }
+    }
+
     private void initEditText() {
-        tvHeaderMessage.addTextChangedListener(new TextWatcher() {
+        tvAdressMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 }
@@ -113,7 +139,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 LogUtils.i("afterTextChanged " + editable.toString());
-                mTest.setMessage(new PusherMessage(editable.toString()));
+                mTest.setMessage(new PusherMessage());
             }
         });
     }
@@ -260,6 +286,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private Subject testData;
+
+
 
 
     private static class MyHandler extends Handler {

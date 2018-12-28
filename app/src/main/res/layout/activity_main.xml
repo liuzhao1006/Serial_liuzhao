@@ -51,7 +51,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_write_message">
 
         <AutoCompleteTextView
-            android:id="@+id/tv_header_message"
+            android:id="@+id/tv_adress_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/tv_header_message"
