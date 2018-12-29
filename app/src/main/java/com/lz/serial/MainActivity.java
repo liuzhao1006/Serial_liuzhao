@@ -89,8 +89,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
 
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             if(readAdapter !=null){
-                mList.add(ConvertUtil.bytesToHexString(bytes));
-                readAdapter.notify(mList);
+//                mList.add(ConvertUtil.bytesToHexString(bytes));
+//                readAdapter.notify(mList);
+                if(bytes[0] == (byte)0x5A ){
+                    bData[0] = bytes[0];
+                }else {
+//                    bytes
+                }
             }
         }));
 
@@ -101,6 +106,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             write(b, 0, b.length);
         });
     }
+
+    private byte[] bData = new byte[255];
 
     @Override
     public void onClick(View view) {
