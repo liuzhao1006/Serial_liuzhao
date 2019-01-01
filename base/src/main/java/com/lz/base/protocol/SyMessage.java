@@ -110,13 +110,10 @@ public class SyMessage {
         System.arraycopy(msg,3,dataValue,0,msg.length - 5);
         System.out.println(ConvertUtil.bytes2String(dataValue));
         byte[] crcValue = getCrcValue(dataValue);//计算的crc值
-
         byte[] msgCrc = new byte[2];
         System.arraycopy(msg,msg.length-2,msgCrc,0,2);
         System.out.println(ConvertUtil.bytes2String(crcValue) + " " + ConvertUtil.bytesToHexString(msgCrc));
-        boolean check = Arrays.equals(crcValue, msgCrc);
-        System.out.println("crc校验:" + check);
-        if(!check){
+        if(!CrcUtils.checkCrc(msgCrc,crcValue)){
             throw new CheckDataException("数据校验不通过");
         }
         SyMessage message = new SyMessage();

@@ -7,9 +7,24 @@ package com.lz.base.observe;
  */
 public class PusherMessage {
 
-    private short frameHead;//帧头
-    private byte count;
+    private String msg;
+    private byte[] bytes;
 
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
 
     public PusherMessage() {
 

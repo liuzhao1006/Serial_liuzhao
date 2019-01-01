@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lz.base.Test;
 import com.lz.serial.inter.ICallBack;
 import com.lz.usbserial.driver.CDCSerialDevice;
 import com.lz.usbserial.driver.UsbSerialDevice;
@@ -70,6 +71,7 @@ public class SerialService extends Service {
     private UsbSerialInterface.UsbReadCallback mCallback = new UsbSerialInterface.UsbReadCallback() {
         @Override
         public void onReceivedData(byte[] arg0) {
+
 
             if (mHandler != null)
                 mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, arg0).sendToTarget();

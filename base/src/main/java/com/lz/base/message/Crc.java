@@ -1,15 +1,11 @@
-package com.lz.base.protocol;
-
-import com.lz.base.util.ConvertUtil;
-
-import java.util.Arrays;
+package com.lz.base.message;
 
 /**
  * 作者      : 刘朝
- * 创建日期  : 2018/12/28 下午2:07
+ * 创建日期  : 2018/12/30 下午12:44
  * 描述     :
  */
-public class CrcUtils {
+public class Crc implements Cloneable{
 
     private static final byte[] crc16_tab_h = { (byte) 0x00, (byte) 0xC1,
             (byte) 0x81, (byte) 0x40, (byte) 0x01, (byte) 0xC0,
@@ -144,173 +140,49 @@ public class CrcUtils {
             (byte) 0x80, (byte) 0x40 };
 
 
+    private static final int CRC_INIT_VALUE = 0xffff;
+    private int crcValue;
+
     /**
-     * 计算CRC16校验
+     * Accumulate the X.25 CRC by adding one char at a time.
+     *
+     * The checksum function adds the hash of one char at a time to the 16 bit
+     * checksum (uint16_t).
      *
      * @param data
-     *            需要计算的数组
-     * @return CRC16校验值
-     */
-    public static int calcCrc16(byte[] data) {
-        return calcCrc16(data, 0, data.length);
+     *            new char to hash
+     **/
+    public  void update_checksum(int data) {
+        data = data & 0xff; //cast because we want an unsigned type
+        int tmp = data ^ (crcValue & 0xff);
+        tmp ^= (tmp << 4) & 0xff;
+        crcValue = ((crcValue >> 8) & 0xff) ^ (tmp << 8) ^ (tmp << 3) ^ ((tmp >> 4) & 0xf);
     }
 
-    public static byte[] calcCrc(byte[] data){
-        int crc = calcCrc16(data);
-
-        byte[] bytes = ConvertUtil.intToByteArray(crc);
-//        System.out.println(bytes.length);
-        byte[] bs = new byte[2];
-        System.arraycopy(bytes,2,bs,0,bytes.length - 2);
-        System.out.println(ConvertUtil.bytes2String(bs));
-        return bs;
+    @Override
+    protected Crc clone(){
+        Crc crc = null;
+        try {
+            crc = (Crc)super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return crc;
     }
 
     /**
-     * 计算CRC16校验
+     * Initialize the buffer for the X.25 CRC
      *
-     * @param data
-     *            需要计算的数组
-     * @param offset
-     *            起始位置
-     * @param len
-     *            长度
-     * @return CRC16校验值
      */
-    public static int calcCrc16(byte[] data, int offset, int len) {
-        return calcCrc16(data, offset, len, 0xffff);
+    public void start_checksum() {
+        crcValue = CRC_INIT_VALUE;
+    }
+    public void finish_checksum(int msgid) {
+        update_checksum(0);
     }
 
-    /**
-     * 计算CRC16校验
-     *
-     * @param data
-     *            需要计算的数组
-     * @param offset
-     *            起始位置
-     * @param len
-     *            长度
-     * @param preval
-     *            之前的校验值
-     * @return CRC16校验值
-     */
-    public static int calcCrc16(byte[] data, int offset, int len, int preval) {
-        int ucCRCHi = (preval & 0xff00) >> 8;
-        int ucCRCLo = preval & 0x00ff;
-        int iIndex;
-        for (int i = 0; i < len; ++i) {
-            iIndex = (ucCRCLo ^ data[offset + i]) & 0x00ff;
-            ucCRCLo = ucCRCHi ^ crc16_tab_h[iIndex];
-            ucCRCHi = crc16_tab_l[iIndex];
-        }
-        return ((ucCRCHi & 0x00ff) << 8) | (ucCRCLo & 0x00ff) & 0xffff;
-    }
-    public static char Crc16Calc(byte[] data_arr, int data_len)
-    {
-        char crc16 = 0;
-        int i;
-        for(i =0; i < (data_len); i++)
-        {
-            crc16 = (char)(( crc16 >> 8) | (crc16 << 8));
-            crc16 ^= data_arr[i]& 0xFF;
-            crc16 ^= (char)(( crc16 & 0xFF) >> 4);
-            crc16 ^= (char)(( crc16 << 8) << 4);
-            crc16 ^= (char)((( crc16 & 0xFF) << 4) << 1);
-        }
-        return crc16;
-    }
-    private static String getCrc(byte[] data) {
-        int high;
-        int flag;
-        // 16位寄存器，所有数位均为1
-        int wcrc = 0xffff;
-        for (int i = 0; i < data.length; i++) {
-            // 16 位寄存器的高位字节
-            high = wcrc >> 8;
-            // 取被校验串的一个字节与 16 位寄存器的高位字节进行“异或”运算
-            wcrc = high ^ data[i];
-
-            for (int j = 0; j < 8; j++) {
-                flag = wcrc & 0x0001;
-                // 把这个 16 寄存器向右移一位
-                wcrc = wcrc >> 1;
-                // 若向右(标记位)移出的数位是 1,则生成多项式 1010 0000 0000 0001 和这个寄存器进行“异或”运算
-                if (flag == 1)
-                    wcrc ^= 0xa001;
-            }
-        }
-
-        return Integer.toHexString(wcrc);
-    }
-    // 测试
-    public static String getCRC(byte[] bytes) {
-        int CRC = 0x0000ffff;
-        int POLYNOMIAL = 0x0000a001;
-        int i, j;
-        for (i = 0; i < bytes.length; i++) {
-            CRC ^= ((int) bytes[i] & 0x000000ff);
-            for (j = 0; j < 8; j++) {
-                if ((CRC & 0x00000001) != 0) {
-                    CRC >>= 1;
-                    CRC ^= POLYNOMIAL;
-                } else {
-                    CRC >>= 1;
-                }
-            }
-        }
-        return Integer.toHexString(CRC);
+    public Crc() {
+        start_checksum();
     }
 
-    /**
-     * 监测crc校验是否通过.
-     * @param msg 原始crc数据
-     * @param crc 根据当前数据算出来的crc
-     * @return
-     */
-    public static boolean checkCrc(byte[] msg, byte[] crc){
-        return Arrays.equals(msg,crc);
-    }
-    public static void main(String[] args) {
-        // 0x02 05 00 03 FF 00 , crc16=7C 09
-        byte[] bsrc = {0x02, 0x05, 0x00, 0x03, (byte) 0xff, 0x00};
-//        int crc = calcCrc16(new byte[] { 0x02, 0x05, 0x00, 0x03, (byte) 0xff, 0x00 });
-//        byte[] bytes = ConvertUtil.intToByteArray(crc);
-//        System.out.println(bytes.length);
-//        byte[] bs = new byte[2];
-//        System.arraycopy(bytes,2,bs,0,bytes.length - 2);
-//        System.out.println(ConvertUtil.bytes2String(bs));
-//        System.out.println(ConvertUtil.bytes2String(bytes));
-//        System.out.println("-------------");
-//        System.out.println(String.format("0x%04x", crc));
-
-
-
-
-        SyMessage message = new SyMessage(bsrc);
-        message.setOrder(OrderMode.WRITE_REGISTER);
-        message.setAdress(new byte[]{(byte)0x11,(byte)0x12});
-        byte[] dataValue = message.getDataValue(message.getBytes());
-//        System.out.println("组装 " + ConvertUtil.bytes2String(dataValue));
-        if(dataValue == null){
-            throw new CheckDataException("数据有误");
-        }
-        byte[] crcValue = message.getCrcValue(dataValue);
-//        System.out.println("crc校验值: " + ConvertUtil.bytesToHexString(crcValue));
-//        System.out.println("下面是组包------");
-        SyMessage syMessage = new SyMessage(bsrc);
-        syMessage.setOrder(OrderMode.WRITE_REGISTER);
-        syMessage.setAdress(new byte[]{(byte)0x11,(byte)0x12});
-        byte[] pack = syMessage.pack();//组包过程中,连带包的crc一起组装了
-//        System.out.println("下面是解包------");
-//        System.out.println(ConvertUtil.bytes2String(pack));
-        SyMessage msg = new SyMessage();
-        SyMessage m = msg.unPack(pack);
-        System.out.println(m.toString());
-
-        System.out.println("------");
-        byte[] bytes = calcCrc(bsrc);
-        System.out.println(ConvertUtil.bytes2String(bytes));
-
-
-    }
 }

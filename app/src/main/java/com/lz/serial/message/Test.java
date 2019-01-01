@@ -24,6 +24,10 @@ public class Test implements Observer, Display {
         init();
     }
 
+    public void removeCallback(Observer o){
+        writeMessage.removeObserver(o);
+    }
+
     public void setMessage(PusherMessage msg){
         LogUtils.i("setMessage " + msg.getMsg());
         writeMessage.setMessage(msg);

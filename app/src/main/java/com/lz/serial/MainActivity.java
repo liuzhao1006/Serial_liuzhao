@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lz.base.Test;
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
 import com.lz.base.observe.PusherMessage;
@@ -28,7 +29,7 @@ import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.ICallBack;
 import com.lz.serial.inter.IReadCallBack;
-import com.lz.serial.message.Test;
+
 import com.lz.serial.service.SerialService;
 import com.lz.serial.utils.Util;
 
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     private AutoCompleteTextView tvContentMessage;
     private ListView lvReadView;
     private ReadAdapter readAdapter;
-    private Test mTest;
+
     private TextView tvTitle;
     private List<String> mList = new ArrayList<>();
 
@@ -57,7 +58,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     @Override
     protected void initView(Bundle savedInstanceState) {
         initUsb();
-        mTest = new Test();
+
         tvTitle = findViewById(R.id.tv_title);
         tvAdressMessage = findViewById(R.id.tv_adress_message);
         tvReadWriteMessage = findViewById(R.id.tv_read_write_message);
@@ -87,15 +88,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             write(b, 0, b.length);
         });*/
 
+        Test test = new Test();
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
+            for (byte anArg0 : bytes) {
+                test.unPack(anArg0);
+            }
             if(readAdapter !=null){
-//                mList.add(ConvertUtil.bytesToHexString(bytes));
-//                readAdapter.notify(mList);
-                if(bytes[0] == (byte)0x5A ){
-                    bData[0] = bytes[0];
-                }else {
-//                    bytes
-                }
+                mList.add(ConvertUtil.bytesToHexString(bytes));
+                readAdapter.notify(mList);
             }
         }));
 
@@ -125,6 +125,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 msg.setAdress(bAdress);
                 msg.setOrder(bOrder);
 
+
                 LogUtils.i(msg.toString());
 
                 break;
@@ -146,7 +147,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             @Override
             public void afterTextChanged(Editable editable) {
                 LogUtils.i("afterTextChanged " + editable.toString());
-                mTest.setMessage(new PusherMessage());
+
             }
         });
     }
@@ -302,6 +303,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
 
         public MyHandler(MainActivity activity) {
             mActivity = new WeakReference<>(activity);
+
         }
 
         @Override
@@ -310,6 +312,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 case SerialService.MESSAGE_FROM_SERIAL_PORT:
                     byte[] bytes = (byte[]) msg.obj;
                     LogUtils.i("bytes " + ConvertUtil.bytesToHexString(bytes));
+
                     if(iReadCallBack != null){
                         iReadCallBack.onIReadCallBack(bytes);
                     }
