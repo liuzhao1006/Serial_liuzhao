@@ -19,15 +19,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lz.base.Test;
+import com.lz.base.protocol.LzPacket;
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
-import com.lz.base.observe.PusherMessage;
 import com.lz.base.observe.Subject;
-import com.lz.base.protocol.SyMessage;
+import com.lz.base.protocol.LzParser;
 import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
-import com.lz.serial.inter.ICallBack;
 import com.lz.serial.inter.IReadCallBack;
 
 import com.lz.serial.service.SerialService;
@@ -88,10 +86,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             write(b, 0, b.length);
         });*/
 
-        Test test = new Test();
+        LzPacket lzPacket = LzPacket.getmInstance();
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             for (byte anArg0 : bytes) {
-                test.unPack(anArg0);
+                lzPacket.unPack(anArg0);
             }
             if(readAdapter !=null){
                 mList.add(ConvertUtil.bytesToHexString(bytes));
@@ -121,7 +119,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 int bOrder = Integer.parseInt(order);
                 String content = tvContentMessage.getText().toString().trim();
                 byte[] bContent = ConvertUtil.hexStringToBytes(content);
-                SyMessage msg = new SyMessage(bContent);
+                LzParser msg = new LzParser(bContent);
                 msg.setAdress(bAdress);
                 msg.setOrder(bOrder);
 
