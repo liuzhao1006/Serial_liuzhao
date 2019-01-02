@@ -35,11 +35,6 @@ public class LzParser {
     private byte[] adress = null;
 
 
-    public LzParser(byte[] bytes) {
-        this.bytes = bytes;
-    }
-
-
     public LzParser() {
     }
 

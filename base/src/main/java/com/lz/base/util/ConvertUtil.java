@@ -1,5 +1,7 @@
 package com.lz.base.util;
 
+import com.lz.base.log.LogUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -21,6 +23,7 @@ public class ConvertUtil {
         }
         return sb.toString();
     }
+
 
     /**
      * 将java的short转化为c或者c#的ushort

@@ -72,6 +72,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         findViewById(R.id.btn_send_two).setOnClickListener(this);
         lzPacket = LzPacket.getmInstance();
         lzPacket.registMessage(voltage);
+        //收到消息的地方.
         voltage.setIVoltage(msg -> Util.runOnUiThread(() -> Util.showToast(msg.toString())));
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             for (byte anArg0 : bytes) {
@@ -95,20 +96,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_send_one:
-                //获取地址
-                String adress = tvAdressMessage.getText().toString().trim();
-                //需要校验一下,这里忽略
-                byte[] bAdress = ConvertUtil.hexStringToBytes(adress);
+                LzParser msg = new LzParser();
+                //order
                 String order = tvReadWriteMessage.getText().toString().trim();
-                int bOrder = Integer.parseInt(order);
+//                int bOrder = ConvertUtil.intToHexInt(order  );
+                msg.setOrder(0x82);
+                //bytes
                 String content = tvContentMessage.getText().toString().trim();
                 byte[] bContent = ConvertUtil.hexStringToBytes(content);
-                LzParser msg = new LzParser(bContent);
+                msg.setBytes(bContent);
+                //adress
+                String adress = tvAdressMessage.getText().toString().trim();
+                byte[] bAdress = ConvertUtil.hexStringToBytes(adress);
                 msg.setAdress(bAdress);
-                msg.setOrder(bOrder);
-
-
                 LogUtils.i(msg.toString());
+                byte[] pack = lzPacket.pack(msg);
+                LogUtils.i("onClick R.id.btn_send_one " + ConvertUtil.bytes2String(pack));
+                write(pack,0,pack.length);
+
 
                 break;
             case R.id.btn_send_two:
