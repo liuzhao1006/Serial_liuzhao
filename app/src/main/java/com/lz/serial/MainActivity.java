@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lz.base.observe.Observer;
 import com.lz.base.protocol.LzPacket;
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
@@ -28,6 +29,7 @@ import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.IReadCallBack;
 
+import com.lz.serial.message.LzVoltage;
 import com.lz.serial.service.SerialService;
 import com.lz.serial.utils.Util;
 
@@ -47,6 +49,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
 
     private TextView tvTitle;
     private List<String> mList = new ArrayList<>();
+    private LzVoltage voltage;
+    private LzPacket lzPacket;
 
     @Override
     protected int getLayoutId() {
@@ -56,6 +60,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     @Override
     protected void initView(Bundle savedInstanceState) {
         initUsb();
+        voltage = new LzVoltage();
 
         tvTitle = findViewById(R.id.tv_title);
         tvAdressMessage = findViewById(R.id.tv_adress_message);
@@ -65,28 +70,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         initEditText();
         findViewById(R.id.btn_send_one).setOnClickListener(this);
         findViewById(R.id.btn_send_two).setOnClickListener(this);
-       /* findViewById(R.id.btn_send_one).setOnClickListener(view -> {
-            String msg = "5A A5 05 82 11 01 00 32";
-            byte[] bytes = ConvertUtil.hexStringToBytes(msg);
-            byte[] b = {(byte) 0x5A, (byte) 0XA5,
-                    (byte) 0X05,(byte) 0X82,(byte) 0X11,(byte) 0X01,(byte) 0X00,
-                    (byte) 0X32};
-
-            Util.showToast(ConvertUtil.bytes2String(b));
-            write(b, 0, b.length);
-        });
-        findViewById(R.id.btn_send_two).setOnClickListener(view -> {
-            String msg = "5A A5 05 82 11 01 00 11";
-            byte[] bytes = ConvertUtil.hexStringToBytes(msg);
-            byte[] b = {(byte) 0x5A, (byte) 0XA5,
-                    (byte) 0X05,(byte) 0X82,(byte) 0X11,(byte) 0X01,(byte) 0X00,
-                    (byte) 0X11};
-
-            Util.showToast(ConvertUtil.bytes2String(b));
-            write(b, 0, b.length);
-        });*/
-
-        LzPacket lzPacket = LzPacket.getmInstance();
+        lzPacket = LzPacket.getmInstance();
+        lzPacket.registMessage(voltage);
+        voltage.setIVoltage(msg -> Util.runOnUiThread(() -> Util.showToast(msg.toString())));
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             for (byte anArg0 : bytes) {
                 lzPacket.unPack(anArg0);
@@ -104,8 +90,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             write(b, 0, b.length);
         });
     }
-
-    private byte[] bData = new byte[255];
 
     @Override
     public void onClick(View view) {
@@ -176,6 +160,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     protected void onStop() {
         super.onStop();
         onUsbPause();
+        lzPacket.registMessage(voltage);
     }
 
     private static IReadCallBack iReadCallBack;

@@ -1,7 +1,5 @@
 package com.lz.base.protocol;
 
-import com.lz.base.util.ConvertUtil;
-
 import java.util.Arrays;
 
 /**
@@ -37,16 +35,13 @@ public class LzParser {
     private byte[] adress = null;
 
 
-
     public LzParser(byte[] bytes) {
         this.bytes = bytes;
     }
 
 
-
     public LzParser() {
     }
-
 
 
     public byte[] getAdress() {
@@ -66,12 +61,15 @@ public class LzParser {
     }
 
     public byte getCount() {
+        //指令(1) + 数据(N) + crc(2)
+        if (getAdress() != null && getBytes() != null)
+            count = (byte) (1 + getAdress().length + getBytes().length + 2);
         return count;
     }
 
-    public void setCount(byte count) {
-        this.count = count;
-    }
+//    public void setCount(byte count) {
+//        this.count = count;
+//    }
 
     public int getOrder() {
         return order;
@@ -93,7 +91,7 @@ public class LzParser {
     public String toString() {
         return "LzParser{" +
                 "head=" + Arrays.toString(head) +
-                ", count=" + count +
+                ", count=" + getCount() +
                 ", order=" + order +
                 ", bytes=" + Arrays.toString(bytes) +
                 ", adress=" + Arrays.toString(adress) +

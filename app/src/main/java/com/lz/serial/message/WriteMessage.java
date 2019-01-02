@@ -3,6 +3,7 @@ package com.lz.serial.message;
 import com.lz.base.observe.Observer;
 import com.lz.base.observe.PusherMessage;
 import com.lz.base.observe.Subject;
+import com.lz.base.protocol.LzParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +17,17 @@ import java.util.List;
 public class WriteMessage implements Subject {
 
     private List<Observer> observers;
-    private PusherMessage message;
+    private LzParser message;
 
     public WriteMessage() {
         observers = new ArrayList<>();
     }
 
-    public PusherMessage getMessage() {
+    public LzParser getMessage() {
         return message;
     }
 
-    public void setMessage(PusherMessage message) {
+    public void setMessage(LzParser message) {
         this.message = message;
         notifyObservers();
     }

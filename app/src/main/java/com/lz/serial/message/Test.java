@@ -6,6 +6,7 @@ import com.lz.base.log.LogUtils;
 import com.lz.base.observe.Display;
 import com.lz.base.observe.Observer;
 import com.lz.base.observe.PusherMessage;
+import com.lz.base.protocol.LzParser;
 import com.lz.serial.utils.Util;
 
 /**
@@ -17,7 +18,7 @@ public class Test implements Observer, Display {
 
     private WriteMessage writeMessage;
 
-    private PusherMessage message;
+    private LzParser message;
 
     public Test() {
 
@@ -28,8 +29,8 @@ public class Test implements Observer, Display {
         writeMessage.removeObserver(o);
     }
 
-    public void setMessage(PusherMessage msg){
-        LogUtils.i("setMessage " + msg.getMsg());
+    public void setMessage(LzParser msg){
+
         writeMessage.setMessage(msg);
     }
 
@@ -42,14 +43,14 @@ public class Test implements Observer, Display {
 
     @Override
     public void display() {
-        Util.runOnUiThread(() -> Util.showToast("display " + message.getMsg()));
-        LogUtils.i("display " + message.getMsg());
+        Util.runOnUiThread(() -> Util.showToast("display " ));
+
     }
 
     @Override
-    public void update(PusherMessage msg) {
+    public void update(LzParser msg) {
         this.message = msg;
-        LogUtils.i("update " + msg.getMsg());
+
         display();
     }
 }

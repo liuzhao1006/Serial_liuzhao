@@ -1,5 +1,7 @@
 package com.lz.base.observe;
 
+import com.lz.base.protocol.LzParser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,14 +13,14 @@ import java.util.List;
 public class LzObserve implements Subject {
 
     private List<Observer> observers;
-    private PusherMessage message;
+    private LzParser parser;
 
-    public PusherMessage getMessage() {
-        return message;
+    public LzParser getMessage() {
+        return parser;
     }
 
-    public void setMessage(PusherMessage message) {
-        this.message = message;
+    public void setMessage(LzParser parser) {
+        this.parser = parser;
     }
 
     public LzObserve() {
@@ -42,7 +44,7 @@ public class LzObserve implements Subject {
     @Override
     public void notifyObservers() {
         for (Observer o : observers) {
-            o.update(message);
+            o.update(parser);
         }
     }
 }

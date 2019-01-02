@@ -23,8 +23,7 @@ public class SerialApp extends Application {
         super.onCreate();
         mContext = getApplicationContext();
         CrashHandler.getInstance().init(getApplicationContext());
-        LogUtils.setAppLogDir(LogUtils.LOG_ROOT_PATHE + LogUtils.APP_LOG_PATHE, 0 + "", 1, -1);
-        LogUtils.setEnable(true);
+
 //        LogcatHelper.getInstance(this).start();
         LogUtils.i("应用程序启动了！！！");
 

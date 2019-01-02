@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
 import com.lz.base.R;
+import com.lz.base.log.LogUtils;
 import com.lz.base.util.UiUtils;
 
 import java.lang.reflect.Method;
@@ -137,6 +138,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                         needRequestPermissonList.add(perm);
                     }
                 }
+                LogUtils.setAppLogDir(LogUtils.LOG_ROOT_PATHE + LogUtils.APP_LOG_PATHE, 0 + "", 1, -1);
+                LogUtils.setEnable(true);
             } catch (Throwable e) {
 
             }
