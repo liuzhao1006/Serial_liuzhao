@@ -8,4 +8,15 @@
     <string name="tv_content_message">读写内容, 值</string>
     <string name="btn_send_one">send</string>
     <string name="btn_send_two">17</string>
+
+    <string name="intro_message">
+        <![CDATA[
+
+
+            This sample shows the two sizes of Floating Action Buttons and how to interact with
+            them.
+
+
+        ]]>
+    </string>
 </resources>

@@ -41,15 +41,15 @@ public class LzPacket {
         observe = new LzObserve();
     }
 
-    public void registMessage(Observer observer){
+    public void registMessage(Observer observer) {
         observe.registerObserver(observer);
     }
 
-    public void unRegistMessage(Observer observer){
+    public void unRegistMessage(Observer observer) {
         observe.removeObserver(observer);
     }
 
-    public void notifyMessage(){
+    public void notifyMessage() {
         observe.notifyObservers();
     }
 
@@ -95,26 +95,21 @@ public class LzPacket {
 
     public void unPack(byte b) {
         switch (lzParser) {
-            case LZ_CRC:
-                if (bCrc[1] == 0x00) {
-                    bCrc[1] = b;
-                } else if (bCrc[0] == 0X00) {
-                    bCrc[0] = b;
+            case LZ_HEAD:
+                if (b == (byte) 0x5A) {//判断是不是第一帧
+                    bHead[0] = b;//第一次进来,赋值,
+                } else if (b == (byte) 0xA5) {//判断还不是第二针
+                    bHead[1] = b;//第二次进来,再次赋值
                 }
-
-                if (bCrc[1] != 0x00 && bCrc[0] != 0x00) {
-                    //此时说明crc都有值了.可以开始校验了
-                    //组装数据
-                    byte[] currentCrc = new byte[1 + bData.length];
-                    currentCrc[0] = bytes[3];
-                    System.arraycopy(bData, 0, currentCrc, 1, bData.length);
-                    byte[] cByteCrc = LzCrcUtils.calcCrc(currentCrc);//e6 33
-                    boolean check = LzCrcUtils.checkCrc(cByteCrc, bCrc);
-                    System.arraycopy(bCrc, 0, bytes, bytes.length - 2, 2);
-                    if (!check) {
+                if (bHead[0] != (byte) 0x5A) {//如果第一帧就错了,那就跳转到错误状态
+                    unPackError(LZParser.LZ_ERROR);
+                    break;
+                }//第一帧是对的,进入第二帧,
+                if (bHead[1] != (byte) 0x00) {//第二帧有值了
+                    if (bHead[1] != (byte) 0xA5) {//判断第二帧的值,错误
                         unPackError(LZParser.LZ_ERROR);
-                    } else {
-                        unPackError(LZParser.LZ_COMPLETE);
+                    } else if (bHead[1] == (byte) 0xA5) {//第二帧的值是正确的
+                        lzParser = LZParser.LZ_LEN;//正确,跳转到第三帧
                     }
                 }
                 break;
@@ -134,40 +129,6 @@ public class LzPacket {
                     lzParser = LZParser.LZ_ORDER;//状态跳转,到指令中
                 }
                 break;
-            case LZ_DATA://数据,迪文屏数据格式包含5部分,
-                // 数据是第四部分,此时数据的长度是根据之前获取的长度计算的.数据长度为 = 长度(bHead[2]) - 指令(1)
-                if (index < bData.length - 1) {//存储数据条件
-                    bData[index++] = b;//存储
-                } else if (index == bData.length - 1) {//存储最后一条条件
-                    bData[index] = b;//存储
-                    System.arraycopy(bData, 0, bytes, 4, bData.length);
-                    lzParser = LZParser.LZ_CRC;//状态跳转,到crc校验中
-                } else {//没有在这个范围内,说明异常了.
-                    unPackError(LZParser.LZ_ERROR);
-                }
-                break;
-            case LZ_HEAD:
-                if (b == (byte) 0x5A) {//判断是不是第一帧
-                    bHead[0] = b;//第一次进来,赋值,
-                } else if (b == (byte) 0xA5) {//判断还不是第二针
-                    bHead[1] = b;//第二次进来,再次赋值
-                }
-                if (bHead[0] != (byte) 0x5A) {//如果第一帧就错了,那就跳转到错误状态
-                    unPackError(LZParser.LZ_ERROR);
-                    break;
-                }//第一帧是对的,进入第二帧,
-                if (bHead[1] != (byte) 0x00) {//第二帧有值了
-                    if (bHead[1] != (byte) 0xA5) {//判断第二帧的值,错误
-                        unPackError(LZParser.LZ_ERROR);
-                    } else if (bHead[1] == (byte) 0xA5) {//第二帧的值是正确的
-                        lzParser = LZParser.LZ_LEN;//正确,跳转到第三帧
-                    }
-                }
-
-                break;
-            case LZ_ERROR://反正遇到问题了
-                resetTest();//清空数据,重新再来.
-                break;
             case LZ_ORDER://指令//接收到的正确的指令
                 if (b == (byte) LzOrderMode.READ_REGISTER
                         || b == (byte) LzOrderMode.WRITE_REGISTER
@@ -183,16 +144,58 @@ public class LzPacket {
                     unPackError(LZParser.LZ_ERROR);
                 }
                 break;
+            case LZ_DATA://数据,迪文屏数据格式包含5部分,
+                // 数据是第四部分,此时数据的长度是根据之前获取的长度计算的.数据长度为 = 长度(bHead[2]) - 指令(1)
+                if (index < bData.length - 1) {//存储数据条件
+                    bData[index++] = b;//存储
+                } else if (index == bData.length - 1) {//存储最后一条条件
+                    bData[index] = b;//存储
+                    System.arraycopy(bData, 0, bytes, 4, bData.length);
+                    lzParser = LZParser.LZ_CRC;//状态跳转,到crc校验中
+                } else {//没有在这个范围内,说明异常了.
+                    unPackError(LZParser.LZ_ERROR);
+                }
+                break;
+            case LZ_CRC:
+                if (bCrc[1] == 0x00) {
+                    bCrc[1] = b;
+                } else if (bCrc[0] == 0X00) {
+                    bCrc[0] = b;
+                }
+                if (bCrc[1] != 0x00 && bCrc[0] != 0x00) {
+                    //此时说明crc都有值了.可以开始校验了
+                    //组装数据 指令.length == 1 , 地址+value == bData
+                    byte[] currentCrc = new byte[1 + bData.length];
+                    //把指令保存到新数组中
+                    currentCrc[0] = bytes[3];
+                    //把其他数据保存到新数组中
+                    System.arraycopy(bData, 0, currentCrc, 1, bData.length);
+                    //计算获取到的数据的crc值
+                    byte[] cByteCrc = LzCrcUtils.calcCrc(currentCrc);//e6 33
+                    //把计算出来的crc值和获取到的crc值进行比较
+                    boolean check = LzCrcUtils.checkCrc(cByteCrc, bCrc);
+                    if (!check) {
+                        unPackError(LZParser.LZ_ERROR);
+                    } else {
+                        //如果校验通过,把数据补全.
+                        System.arraycopy(bCrc, 0, bytes, bytes.length - 2, 2);
+                        unPackError(LZParser.LZ_COMPLETE);
+                    }
+                }
+                break;
             case LZ_COMPLETE://完成了 清空数据,将老数据丢到队列中去
                 LzParser message = new LzParser();
                 message.setOrder(bytes[3]);
                 message.setBytes(bData);
-                message.setAdress(new byte[]{bData[0], bData[1]});
-                if(observe != null){
+                message.setCrc(bCrc);
+                if (observe != null) {
                     observe.setMessage(message);
-                    observe.notifyObservers();
+                    notifyMessage();
                 }
                 resetTest();
+                break;
+            case LZ_ERROR://反正遇到问题了
+                resetTest();//清空数据,重新再来.
                 break;
         }
     }
@@ -202,21 +205,16 @@ public class LzPacket {
             return null;
         }
         byte len = parser.getCount();//数据长度
-        System.out.println("pack len " + len);
         byte[] bytes = new byte[2 + 1 + len];//创建一个
-        System.out.println("pack bytes " + ConvertUtil.bytesToHexString(bytes));
         //帧头
         byte[] head = parser.getHead();
-        System.out.println("pack head " + ConvertUtil.bytesToHexString(head));
         System.arraycopy(head, 0, bytes, 0, head.length);//帧头
         //长度
         bytes[2] = len;
-        //数据
+        //指令 + 数据
         byte[] data = new byte[len - 2];
-        System.out.println("pack data " +ConvertUtil.bytesToHexString(data));
         //指令
         int order = parser.getOrder();
-        System.out.println("pack order " + order);
         if (order == LzOrderMode.READ_REGISTER
                 || order == LzOrderMode.WRITE_REGISTER
                 || order == LzOrderMode.READ_VARIABLES
@@ -227,37 +225,22 @@ public class LzPacket {
             //组包过程中,如果指令不合适,那么失败
             return null;
         }
-        System.out.println("pack order " + order);
-        //地址
-        byte[] adress = parser.getAdress();
-        if(adress == null){
-            return null;
-        }
-        System.arraycopy(adress,0,data,1,2);
-        System.out.println("pack adress " + ConvertUtil.bytesToHexString(bytes));
-        //数据
-        byte[] value = parser.getBytes();
-        if(value != null){
-            System.arraycopy(value,0,data,2,value.length);
-        }
-        System.arraycopy(data,0,bytes,3,data.length);
-        System.out.println("pack value " + ConvertUtil.bytesToHexString(bytes));
-        //crc 校准
-        byte[] crc = LzCrcUtils.calcCrc(data);
-        //转换位置, 必须
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.out.println("pack crc " + ConvertUtil.bytesToHexString(crc));
-        //校验
-        System.arraycopy(crc,0,bytes,bytes.length - 2, 2);
 
-        System.out.println("pack bytes " + ConvertUtil.bytesToHexString(bytes));
+        byte[] value = parser.getBytes();
+        if (value != null) {
+            System.arraycopy(value, 0, data, 2, value.length);
+        }
+        System.arraycopy(data, 0, bytes, 3, data.length);
+        //crc 校准
+        byte[] crc = parser.getCrc();
+        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
         return bytes;
     }
 
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
+    private void getQueue(){
+
+    }
 
     public interface IComplete {
         void unPack(byte[] bytes);
@@ -265,12 +248,12 @@ public class LzPacket {
 
     public static void main(String[] args) {
         LzParser parser = new LzParser();
-        parser.setHead(new byte[]{(byte)0x5a,(byte)0xa5});
+        parser.setHead(new byte[]{(byte) 0x5a, (byte) 0xa5});
         parser.setOrder(0x80);
-        parser.setAdress(new byte[]{(byte)0x11,(byte)0x01});
-        parser.setBytes(new byte[]{(byte)0x32,(byte)0x32});
+        parser.setBytes(new byte[]{(byte) 0x11, (byte) 0x01,(byte) 0x32, (byte) 0x32});
 //        parser.setCount((byte) 6);
         LzPacket packet = LzPacket.getmInstance();
         packet.pack(parser);
+
     }
 }

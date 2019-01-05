@@ -1,7 +1,6 @@
 package com.lz.serial.message;
 
 import com.lz.base.observe.Observer;
-import com.lz.base.observe.PusherMessage;
 import com.lz.base.observe.Subject;
 import com.lz.base.protocol.LzParser;
 

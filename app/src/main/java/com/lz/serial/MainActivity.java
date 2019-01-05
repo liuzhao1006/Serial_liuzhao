@@ -11,24 +11,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lz.base.observe.Observer;
-import com.lz.base.protocol.LzPacket;
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
-import com.lz.base.observe.Subject;
+import com.lz.base.protocol.LzPacket;
 import com.lz.base.protocol.LzParser;
 import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.IReadCallBack;
-
 import com.lz.serial.message.LzVoltage;
 import com.lz.serial.service.SerialService;
 import com.lz.serial.utils.Util;
@@ -39,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener{
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private AutoCompleteTextView tvAdressMessage;
     private AutoCompleteTextView tvReadWriteMessage;
@@ -67,7 +62,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         tvReadWriteMessage = findViewById(R.id.tv_read_write_message);
         tvContentMessage = findViewById(R.id.tv_content_message);
         initListView();
-        initEditText();
         findViewById(R.id.btn_send_one).setOnClickListener(this);
         findViewById(R.id.btn_send_two).setOnClickListener(this);
         lzPacket = LzPacket.getmInstance();
@@ -78,7 +72,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             for (byte anArg0 : bytes) {
                 lzPacket.unPack(anArg0);
             }
-            if(readAdapter !=null){
+            if (readAdapter != null) {
                 mList.add(ConvertUtil.bytesToHexString(bytes));
                 readAdapter.notify(mList);
             }
@@ -86,7 +80,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
 
         findViewById(R.id.tv_read_message).setOnClickListener(view -> {
             byte[] b = {(byte) 0x5A, (byte) 0XA5,
-                    (byte) 0X04,(byte) 0X83,(byte) 0X11,(byte) 0X01,(byte) 0X01};
+                    (byte) 0X04, (byte) 0X83, (byte) 0X11, (byte) 0X01, (byte) 0X01};
             Util.showToast(ConvertUtil.bytes2String(b));
             write(b, 0, b.length);
         });
@@ -94,26 +88,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_send_one:
                 LzParser msg = new LzParser();
                 //order
                 String order = tvReadWriteMessage.getText().toString().trim();
 //                int bOrder = ConvertUtil.intToHexInt(order  );
                 msg.setOrder(0x82);
-                //bytes
-                String content = tvContentMessage.getText().toString().trim();
-                byte[] bContent = ConvertUtil.hexStringToBytes(content);
-                msg.setBytes(bContent);
                 //adress
                 String adress = tvAdressMessage.getText().toString().trim();
-                byte[] bAdress = ConvertUtil.hexStringToBytes(adress);
-                msg.setAdress(bAdress);
+                //bytes
+                String content = tvContentMessage.getText().toString().trim();
+                byte[] bContent = ConvertUtil.hexStringToBytes(adress + content);
+                msg.setBytes(bContent);
+
                 LogUtils.i(msg.toString());
                 byte[] pack = lzPacket.pack(msg);
                 LogUtils.i("onClick R.id.btn_send_one " + ConvertUtil.bytes2String(pack));
-                write(pack,0,pack.length);
-
+                write(pack, 0, pack.length);
 
                 break;
             case R.id.btn_send_two:
@@ -121,23 +113,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         }
     }
 
-    private void initEditText() {
-        tvAdressMessage.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                LogUtils.i("afterTextChanged " + editable.toString());
-
-            }
-        });
-    }
 
     private void initListView() {
         lvReadView = findViewById(R.id.lv_read_view);
@@ -165,11 +140,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     protected void onStop() {
         super.onStop();
         onUsbPause();
-        lzPacket.registMessage(voltage);
+        lzPacket.unRegistMessage(voltage);
     }
 
     private static IReadCallBack iReadCallBack;
-    private static void setiReadCallBack(IReadCallBack callBack){
+
+    private static void setiReadCallBack(IReadCallBack callBack) {
         iReadCallBack = callBack;
     }
 
@@ -215,7 +191,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 LogUtils.i(device.toString());
                 Util.runOnUiThread(() -> {
                     tvTitle.setText(device.getDeviceName());
-                    Util.showToast(device.toString());
+//                    Util.showToast(device.toString());
                 });
             });
         }
@@ -281,8 +257,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         serialService.requestPermission();
     }
 
-    private Subject testData;
-
 
 
 
@@ -301,7 +275,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                     byte[] bytes = (byte[]) msg.obj;
                     LogUtils.i("bytes " + ConvertUtil.bytesToHexString(bytes));
 
-                    if(iReadCallBack != null){
+                    if (iReadCallBack != null) {
                         iReadCallBack.onIReadCallBack(bytes);
                     }
                     break;

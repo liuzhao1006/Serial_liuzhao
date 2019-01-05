@@ -5,7 +5,6 @@ import android.content.Context;
 import com.lz.base.log.LogUtils;
 import com.lz.base.observe.Display;
 import com.lz.base.observe.Observer;
-import com.lz.base.observe.PusherMessage;
 import com.lz.base.protocol.LzParser;
 import com.lz.serial.utils.Util;
 

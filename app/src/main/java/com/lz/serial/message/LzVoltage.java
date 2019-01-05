@@ -7,11 +7,12 @@ import com.lz.base.protocol.LzParser;
 /**
  * 作者      : 刘朝
  * 创建日期  : 2019/1/2 下午5:08
- * 描述     :
+ * 描述     : 解析数据总类, 在这里完成数据分发
  */
 public class LzVoltage implements Observer {
     @Override
     public void update(LzParser msg) {
+
         if(iVoltage != null){
             iVoltage.onVoltage(msg);
         }
