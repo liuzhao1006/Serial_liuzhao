@@ -12,8 +12,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +24,7 @@ import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
 import com.lz.base.protocol.LzPacket;
 import com.lz.base.protocol.LzParser;
+import com.lz.base.protocol.common.LzUserOrder;
 import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.IReadCallBack;
@@ -46,6 +50,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private List<String> mList = new ArrayList<>();
     private LzVoltage voltage;
     private LzPacket lzPacket;
+    private Spinner spinner;
 
     @Override
     protected int getLayoutId() {
@@ -84,8 +89,77 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Util.showToast(ConvertUtil.bytes2String(b));
             write(b, 0, b.length);
         });
+
+        //spinner
+        spinner = findViewById(R.id.spinner);
+        String[] arr = this.getResources().getStringArray(R.array.arr);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, arr);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                switch (position) {
+                    case 0:
+                        byte[] ledLight = LzUserOrder.getLedLight();
+                        write(ledLight,0, ledLight.length);
+
+                        Util.showToast(arr[position]+ position+ "  " + ConvertUtil.bytesToHexString(ledLight));
+                        break;
+                    case 1:
+                        byte[] pageId = LzUserOrder.getPageId();
+                        write(pageId,0,pageId.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId));
+                        break;
+                    case 2:
+                        byte[] bytes = LzUserOrder.setLedLight(ConvertUtil.intToByte(setLedLight+=5));
+                        write(bytes,0,bytes.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bytes));
+                        break;
+                    case 3:
+                        byte[] pageId3 = LzUserOrder.setPageId(ConvertUtil.intToByte(pageIds++));
+                        write(pageId3,0,pageId3.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId3));
+                        break;
+                    case 4:
+                        byte[] bz = LzUserOrder.setBuzzer((byte) 0x20);
+                        write(bz,0,bz.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bz));
+                        break;
+                    case 5:
+                        byte[] reset = LzUserOrder.setReset();
+                        write(reset,0,reset.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(reset));
+                        break;
+                    case 6:
+                        byte[] calibration = LzUserOrder.setCalibration();
+                        write(calibration,0,calibration.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(calibration));
+                        break;
+                    case 7:
+                        byte[] touch = LzUserOrder.setTouchFunction((byte) 0x00);
+                        write(touch,0,touch.length);
+                        Util.showToast(arr[position] + position + "  " + ConvertUtil.bytesToHexString(touch));
+                        break;
+                    case 8:
+                        byte[] time = LzUserOrder.setCurRtcTime();
+                        write(time,0,time.length);
+                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(time));
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
+    private int setLedLight = 5 ;
+    private int pageIds = 5 ;
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -256,8 +330,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void connectUsb() {
         serialService.requestPermission();
     }
-
-
 
 
     private static class MyHandler extends Handler {

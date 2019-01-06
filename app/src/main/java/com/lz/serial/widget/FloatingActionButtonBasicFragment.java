@@ -16,15 +16,15 @@
 
 package com.lz.serial.widget;
 
-import com.example.android.common.logger.Log;
 
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.lz.serial.R;
 
 
 /**
@@ -32,8 +32,7 @@ import android.view.ViewGroup;
  * changes on them.
  */
 public class FloatingActionButtonBasicFragment extends Fragment implements FloatingActionButton.OnCheckedChangeListener{
-
-    private final static String TAG = "FloatingActionButtonBasicFragment";
+    private static final String TAG = "FloatingActionButtonBasicFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,10 +54,10 @@ public class FloatingActionButtonBasicFragment extends Fragment implements Float
         // When a FAB is toggled, log the action.
         switch (fabView.getId()){
             case R.id.fab_1:
-                Log.d(TAG, String.format("FAB 1 was %s.", isChecked ? "checked" : "unchecked"));
+                Log.d("", String.format("FAB 1 was %s.", isChecked ? "checked" : "unchecked"));
                 break;
             case R.id.fab_2:
-                Log.d(TAG, String.format("FAB 2 was %s.", isChecked ? "checked" : "unchecked"));
+                Log.d("", String.format("FAB 2 was %s.", isChecked ? "checked" : "unchecked"));
                 break;
             default:
                 break;

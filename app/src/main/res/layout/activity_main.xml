@@ -16,7 +16,7 @@
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="40dp"
             android:layout_marginBottom="8dp"
             android:gravity="center"
             android:text="@string/tv_title"
@@ -132,7 +132,7 @@
             android:id="@+id/lv_read_view"
             style="@style/Widget.AppCompat.ListView.DropDown"
             android:layout_width="0dp"
-            android:layout_height="161dp"
+            android:layout_height="100dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
@@ -163,33 +163,17 @@
             app:layout_constraintEnd_toEndOf="@+id/tv_title"
             app:layout_constraintTop_toBottomOf="@+id/lv_read_view" />
 
-        <ViewAnimator
-            android:id="@+id/sample_output"
+        <Spinner
+            android:id="@+id/spinner"
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1">
-
-            <ScrollView
-                style="@style/Widget.SampleMessageTile"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    style="@style/Widget.SampleMessage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="@dimen/horizontal_page_margin"
-                    android:paddingRight="@dimen/horizontal_page_margin"
-                    android:paddingTop="@dimen/vertical_page_margin"
-                    android:paddingBottom="@dimen/vertical_page_margin"
-                    android:text="@string/intro_message" />
-
-            </ScrollView>
-
-
-
-        </ViewAnimator>
-
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:entries="@array/arr"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_send_one" />
 
 
     </android.support.constraint.ConstraintLayout>
