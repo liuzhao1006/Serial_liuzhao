@@ -17,17 +17,11 @@ public class LzUserOrder {
     /**
      * 读取背光亮度值
      *
-     * @return 返回报文
+     * @return
      */
     public static byte[] getLedLight() {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X01, (byte) 0X01, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X81, (byte) 0X01, (byte) 0X01});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X01, (byte) 0X01,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
     }
 
     /**
@@ -38,14 +32,9 @@ public class LzUserOrder {
      */
     public static byte[] setLedLight(byte b) {
 
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X01, b, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X81, (byte) 0X01, b});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81,(byte) 0X01, b,(byte)0x00,(byte)0x00};
+
+        return getCrc(bytes);
     }
 
     /**
@@ -54,14 +43,8 @@ public class LzUserOrder {
      * @return 返回发送的指令
      */
     public static byte[] getPageId() {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X03, (byte) 0X02, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X81, (byte) 0X03, (byte) 0X02});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X03, (byte) 0X02,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
     }
 
     /**
@@ -71,14 +54,8 @@ public class LzUserOrder {
      * @return 返回发送的指令
      */
     public static byte[] setPageId(byte b) {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X06, (byte) 0X80, (byte) 0X03, (byte) 0X00, b, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X80, (byte) 0X03, (byte) 0X00, b});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X06, (byte) 0X80, (byte) 0X03, (byte) 0X00, b,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
     }
 
     /**
@@ -88,14 +65,8 @@ public class LzUserOrder {
      * @return 返回发送的指令
      */
     public static byte[] setBuzzer(byte b) {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0X02, b, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X80, (byte) 0X02, b});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0X02, b,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
     }
 
     /**
@@ -104,14 +75,8 @@ public class LzUserOrder {
      * @return 返回发送的指令
      */
     public static byte[] setReset() {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X06, (byte) 0X80, (byte) 0XEE, (byte) 0X5A, (byte) 0XA5, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X80, (byte) 0XEE, (byte) 0X5A, (byte) 0XA5});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X06, (byte) 0X80, (byte) 0XEE, (byte) 0X5A, (byte) 0XA5,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
     }
 
     /**
@@ -120,14 +85,7 @@ public class LzUserOrder {
      * @return 返回发送的指令
      */
     public static byte[] setCalibration() {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0XEA, (byte) 0X5A, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X80, (byte) 0XEA, (byte) 0X5A});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        return getCrc(new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0XEA, (byte) 0X5A,(byte)0x00,(byte)0x00});
     }
 
     /**
@@ -137,15 +95,19 @@ public class LzUserOrder {
      * @return 返回发送的指令
      */
     public static byte[] setTouchFunction(byte b) {
-        byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0X0B, b, (byte) 0x00, (byte) 0x00};
-        byte[] crc = LzCrcUtils.calcCrc(new byte[]{(byte) 0X80, (byte) 0X0B, b});
-        byte temp;
-        temp = crc[0];
-        crc[0] = crc[1];
-        crc[1] = temp;
-        System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        return getCrc(new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0X0B, b,(byte)0x00,(byte)0x00});
     }
+
+    /**
+     * 弹窗显示
+     * @param b 弹窗的id
+     * @return 返回发送的指令
+     */
+    public static byte[] setPopupWindow(byte b){
+        byte[] bytes = new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X80, (byte) 0X4F, b,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
+    }
+
 
     /**
      * 设置数字变量
@@ -238,8 +200,8 @@ public class LzUserOrder {
 
     /**
      * 设置当前时间给屏幕
-     *
      * @return 返回发送的指令
+     * 设置当前时间给屏幕 5a a5 03 80 1f 5a 19 01 06 09 19 18 34 a6
      */
     public static byte[] setCurRtcTime() {
         String year;
@@ -250,7 +212,7 @@ public class LzUserOrder {
         String second;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             LocalDate ld = LocalDate.now();
-            year = (ld.getYear() + "").substring(2, 4);
+            year = (ld.getYear()+ "").substring(2,4);
             month = (ld.getMonthValue() + 1) + "";
             day = ld.getDayOfMonth() + "";
             LocalTime lt = LocalTime.now();
@@ -260,26 +222,26 @@ public class LzUserOrder {
 
         } else {
             Calendar c = Calendar.getInstance();
-            year = (c.get(Calendar.YEAR) + "").substring(2, 4);
+            year = (c.get(Calendar.YEAR)+ "").substring(2,4);
             month = (c.get(Calendar.MONTH) + 1) + "";
             day = c.get(Calendar.DATE) + "";
             hour = c.get(Calendar.HOUR_OF_DAY) + "";
             minute = c.get(Calendar.MINUTE) + "";
             second = c.get(Calendar.SECOND) + "";
         }
-        if (month.length() < 2) {
+        if(month.length() < 2){
             month = 0 + month;
         }
-        if (day.length() < 2) {
+        if(day.length() < 2){
             day = 0 + day;
         }
-        if (hour.length() < 2) {
+        if(hour.length() < 2){
             hour = 0 + hour;
         }
-        if (minute.length() < 2) {
+        if(minute.length() < 2){
             minute = 0 + minute;
         }
-        if (second.length() < 2) {
+        if(second.length() < 2){
             second = 0 + second;
         }
         String sb = year +
@@ -294,20 +256,29 @@ public class LzUserOrder {
         byte[] per = new byte[]{(byte) 0X5A, (byte) 0XA5,
                 (byte) 0X03, (byte) 0X80, (byte) 0X1F,
                 (byte) 0X5A};
-        byte[] crc = new byte[3 + time.length];
-        crc[0] = (byte) 0X80;
-        crc[1] = (byte) 0X1F;
-        crc[2] = (byte) 0X5A;
-        System.arraycopy(time, 0, crc, 3, time.length);
-        byte[] crcValue = LzCrcUtils.calcCrc(crc);
+        System.arraycopy(per,0,bytes,0,per.length);
+        System.arraycopy(time,0,bytes,6,time.length);
+        return getCrc(bytes);
+    }
+
+    /**
+     * 计算crc校验值
+     * @param b 未校验的crc值
+     * @return 返回还是b，而且已经校验了crc的值
+     */
+    public static byte[] getCrc(byte[] b){
+        byte[] crcData = new byte[b.length - 3 - 2];
+        System.arraycopy(b,3,crcData,0,crcData.length);
+        byte[] crc = LzCrcUtils.calcCrc(crcData);
         byte temp;
-        temp = crcValue[0];
-        crcValue[0] = crcValue[1];
-        crcValue[1] = temp;
-        System.arraycopy(per, 0, bytes, 0, per.length);
-        System.arraycopy(time, 0, bytes, 6, time.length);
-        System.arraycopy(crcValue, 0, bytes, bytes.length - 2, 2);
-        return bytes;
+        temp = crc[0];
+        crc[0] = crc[1];
+        crc[1] = temp;
+        System.arraycopy(crc,0,b,b.length-2,2);
+        System.out.println("计算crc校验值 " + ConvertUtil.bytesToHexString(b));
+        return b;
+
+
     }
 
     public static void main(String[] args) {

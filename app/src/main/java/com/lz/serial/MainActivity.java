@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
+import com.lz.base.protocol.LzCrcUtils;
 import com.lz.base.protocol.LzPacket;
 import com.lz.base.protocol.LzParser;
 import com.lz.base.protocol.common.LzUserOrder;
@@ -147,6 +148,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         write(time,0,time.length);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(time));
                         break;
+                    case 9:
+                        String popupWindow = tvReadWriteMessage.getText().toString().trim();
+                        LzUserOrder.setPopupWindow((byte)0x01);
+                        break;
 
                 }
             }
@@ -167,9 +172,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 LzParser msg = new LzParser();
                 //order
                 String order = tvReadWriteMessage.getText().toString().trim();
-//                int bOrder = ConvertUtil.intToHexInt(order  );
                 msg.setOrder(0x82);
-                //adress
                 String adress = tvAdressMessage.getText().toString().trim();
                 //bytes
                 String content = tvContentMessage.getText().toString().trim();
@@ -180,7 +183,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 byte[] pack = lzPacket.pack(msg);
                 LogUtils.i("onClick R.id.btn_send_one " + ConvertUtil.bytes2String(pack));
                 write(pack, 0, pack.length);
-
                 break;
             case R.id.btn_send_two:
                 break;
@@ -194,13 +196,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         lvReadView.setAdapter(readAdapter);
         lvReadView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         lvReadView.setStackFromBottom(true);
-        /*//创造假数据
-        List<String> mList = new ArrayList<>();
-        for (int i = 0 ; i < 30 ; i++){
-            mList.add("刘朝:" + i);
-        }
-
-        readAdapter.notify(mList);*/
     }
 
 
