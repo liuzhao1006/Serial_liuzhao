@@ -1,8 +1,10 @@
 package com.lz.base.protocol.common;
 
 import com.lz.base.protocol.LzCrcUtils;
+import com.lz.base.protocol.LzOrderMode;
 import com.lz.base.util.ConvertUtil;
 
+import java.security.PublicKey;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Calendar;
@@ -40,7 +42,14 @@ public class LzUserOrder {
     /**
      * 发送读取当前页面编号指令
      *
-     * @return 返回发送的指令
+     * @return 返回发送的指令 ：5a a5 05 81 03 02 a0 d9
+     * 应答： 5A A5 07 81 03 02 00 02 38 5B
+     * 头：5A A5
+     * 数据长度：07
+     * 指令：81
+     * 地址：03 02
+     * 数据（页面编号）：00 02
+     * crc校验：38 5B
      */
     public static byte[] getPageId() {
         byte[] bytes = {(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X03, (byte) 0X02,(byte)0x00,(byte)0x00};
@@ -108,39 +117,55 @@ public class LzUserOrder {
         return getCrc(bytes);
     }
 
-
     /**
-     * 设置数字变量
-     *
-     * @param number 值
-     * @return 返回报文
+     * 获取迪文屏幕软件的版本号
+     * @return 获取迪文屏幕软件版本号命令 ： 5a a5 05 81 00 01 e0 28
      */
-    public static byte[] setNumericType(int number) {
-
-        return null;
+    public static byte[] getDGUSVersion(){
+        return getCrc(new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X00, (byte) 0X01, (byte)0x00,(byte)0x00});
     }
 
     /**
-     * 设置数字变量
+     * 读取0x20寄存器中所保存的当前RTC值（年月日，星期，时分秒）。
+     * @return 指令命令 ：5a a5 05 81 20 07 79 ea
      *
-     * @param number 值
-     * @return 返回报文
+     * 返回数据格式为：5A A5 0C 81 20 07 19 01 20 00 22 16 13 19 7D
+     * 头：5A A5
+     * 数据长度：0C
+     * 指令：81
+     * 地址：20 07
+     * 时间：19（年） 01（月） 20（日） 00（星期） 22（时） 16（分） 13（秒） 19 7D（crc校验）
      */
-    public static byte[] setNumericType(float number) {
-
-        return null;
+    public static byte[] getCurrentTime(){
+        return getCrc(new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X20, (byte) 0X07, (byte)0x00,(byte)0x00});
     }
+
 
     /**
-     * 设置数字变量
-     *
-     * @param number 值
-     * @return 返回报文
+     * 设置int类型值
+     * @param order 发送指令
+     * @param address 发送地址
+     * @param number int类型值
+     * @return 返回发送的数据，包括crc校验
      */
-    public static byte[] setNumericType(double number) {
-
-        return null;
+    public static byte[] setNumbericIntType(byte order, byte[] address, int number){
+        byte[] value = ConvertUtil.intToByteArray(number);
+        return setValue(order, address, value);
     }
+    /**
+     * 设置int类型值
+     * @param order 发送指令
+     * @param address 发送地址
+     * @param number float类型值
+     * @return 返回发送的数据，包括crc校验
+     */
+    public static byte[] setNumbericFloatType(byte order, byte[] address, float number){
+        int numberInt = Float.floatToIntBits(number);
+        byte[] value = ConvertUtil.intToByteArray(numberInt);
+        return setValue(order, address, value);
+    }
+
+
 
     /**
      * 设置文本变量
@@ -148,11 +173,11 @@ public class LzUserOrder {
      * @param text 文本内容
      * @return 返回报文
      */
-    public static byte[] setTextType(String text) {
-
-
-        return null;
+    public static byte[] setTextType(byte order, byte[] address,String text) {
+        return setValue(order,address,ConvertUtil.hexStringToBytes(ConvertUtil.str2HexStr(text)));
     }
+
+
 
     /**
      * 设置变量颜色
@@ -173,16 +198,6 @@ public class LzUserOrder {
      * @return 返回报文
      */
     public static byte[] getTextValue(byte[] address) {
-
-        return null;
-    }
-
-    /**
-     * 获取当前页面id
-     *
-     * @return 返回报文
-     */
-    public static byte[] getCurrentPage() {
 
         return null;
     }
@@ -260,7 +275,28 @@ public class LzUserOrder {
         System.arraycopy(time,0,bytes,6,time.length);
         return getCrc(bytes);
     }
-
+    /**
+     * 设置值，
+     * @param order 指令
+     * @param address 地址
+     * @param value 值
+     * @return 返回报文
+     */
+    public static byte[] setValue(byte order, byte[] address,byte[] value){
+        int addressLength = address.length;
+        int numberLength = value.length;
+        int count = 1 +addressLength + numberLength + 2;
+        byte[] bytes = new byte[2 + 1 + count];
+        bytes[0] = LzConstants.HEAD_PER;
+        bytes[1] = LzConstants.HEAD_END;
+        bytes[2] = (byte) count;
+        bytes[3] = order;
+        System.arraycopy(address,0,bytes,4,addressLength);
+        System.arraycopy(value,0,bytes,4 + addressLength,numberLength);
+        byte[] crc = getCrc(bytes);
+        System.out.println("设置文本变量 " + ConvertUtil.bytesToHexString(crc));
+        return crc;
+    }
     /**
      * 计算crc校验值
      * @param b 未校验的crc值
@@ -275,7 +311,7 @@ public class LzUserOrder {
         crc[0] = crc[1];
         crc[1] = temp;
         System.arraycopy(crc,0,b,b.length-2,2);
-        System.out.println("计算crc校验值 " + ConvertUtil.bytesToHexString(b));
+//        System.out.println("计算crc校验值 " + ConvertUtil.bytesToHexString(b));
         return b;
 
 
@@ -291,5 +327,11 @@ public class LzUserOrder {
         System.out.println("触摸屏校准 " + ConvertUtil.bytesToHexString(setCalibration()));
         System.out.println("触摸功能 " + ConvertUtil.bytesToHexString(setTouchFunction((byte) 0x00)));
         System.out.println("设置当前时间给屏幕 " + ConvertUtil.bytesToHexString(setCurRtcTime()));
+        System.out.println("获取迪文屏幕软件版本号 " + ConvertUtil.bytesToHexString(getDGUSVersion()));
+        System.out.println("crc " + ConvertUtil.bytesToHexString(getCrc(new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X20, (byte) 0X07, (byte)0x00,(byte)0x00})));
+        System.out.println("设置int类型值 " + ConvertUtil.bytes2String(setNumbericIntType((byte) LzOrderMode.READ_REGISTER,new byte[]{(byte) 0x01,(byte) 0x00}, 5)));
+        System.out.println("设置float类型值 " + ConvertUtil.bytes2String(setNumbericFloatType((byte) LzOrderMode.READ_REGISTER,new byte[]{(byte) 0x01,(byte) 0x00}, 5.5f)));
+        System.out.println("设置文本类型值 " + ConvertUtil.bytes2String(setTextType((byte) LzOrderMode.READ_REGISTER,new byte[]{(byte) 0x01,(byte) 0x00},"刘朝")));
+        System.out.println("------------------");
     }
 }

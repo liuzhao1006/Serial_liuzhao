@@ -157,12 +157,11 @@ public class LzCrcUtils {
 
     public static byte[] calcCrc(byte[] data){
         int crc = calcCrc16(data);
-
         byte[] bytes = ConvertUtil.intToByteArray(crc);
 //        System.out.println(bytes.length);
         byte[] bs = new byte[2];
         System.arraycopy(bytes,2,bs,0,bytes.length - 2);
-        System.out.println(ConvertUtil.bytes2String(bs));
+//        System.out.println(ConvertUtil.bytes2String(bs));
         return bs;
     }
 
