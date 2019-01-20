@@ -1,5 +1,7 @@
 package com.lz.base.protocol;
 
+import com.lz.base.util.ConvertUtil;
+
 import java.util.Arrays;
 
 /**
@@ -25,7 +27,7 @@ public class LzParser {
     private int order;
 
     /**
-     * 数据,包括 变量地址,数据,不包含crc校验码
+     * 数据包括 变量地址,数据,不包含crc校验码
      */
     private byte[] bytes = null;
 
@@ -42,6 +44,7 @@ public class LzParser {
             crc[0] = crc[1];
             crc[1] = temp;
         }
+        System.out.println("getCrc() " + ConvertUtil.bytesToHexString(crc));
         return crc;
     }
 
@@ -113,9 +116,11 @@ public class LzParser {
             case VARIABLE_SPACE_WRITE:
                 address = new byte[2];
                 break;
-
         }
+        System.out.println("getAddress() "+ConvertUtil.bytes2String(bytes));
+
         System.arraycopy(bytes, 0, address, 0, address.length);
+        System.out.println("getAddress() "+ ConvertUtil.bytesToHexString(address));
         return address;
     }
 
@@ -132,9 +137,14 @@ public class LzParser {
 
     public byte getCount() {
         //指令(1) + 数据(N) + crc(2)
-        if (getBytes() != null)
+        if (getBytes() != null){
             count = (byte) (1 + getBytes().length + 2);
+        }else {
+            count = (byte)0x03;
+        }
+
         return count;
+
     }
 
     public int getOrder() {
@@ -151,8 +161,9 @@ public class LzParser {
 
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
-
+        getCount();
         getAddress();
+        getCrc();
     }
 
 
@@ -167,5 +178,21 @@ public class LzParser {
                 ", type=" + type +
                 ", address=" + Arrays.toString(address) +
                 '}';
+    }
+
+    private static long startTime;
+    public static void main(String[] args) {
+        System.out.println("起始:"+System.currentTimeMillis());
+        startTime = System.currentTimeMillis();
+
+        //测试,连续发送1000条数据,解析速度为492ms
+        for (int i = 0; i < 2000; i++) {
+            LzParser lzParser = new LzParser();
+            lzParser.setOrder(0x81);
+            lzParser.setBytes(new byte[]{(byte)0x00,(byte)0x01,(byte)0x01});
+            System.out.println( i + " -> " + ConvertUtil.bytes2String(LzPacket.getmInstance().pack(lzParser)));
+            LzPacket.getmInstance().pack(lzParser);
+        }
+        System.out.println("结束:"+( System.currentTimeMillis() - startTime ));
     }
 }

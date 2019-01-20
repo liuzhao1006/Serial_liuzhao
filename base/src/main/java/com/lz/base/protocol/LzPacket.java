@@ -1,17 +1,8 @@
 package com.lz.base.protocol;
 
-import android.print.PageRange;
-
 import com.lz.base.observe.LzObserve;
 import com.lz.base.observe.Observer;
-import com.lz.base.protocol.LzCrcUtils;
-import com.lz.base.protocol.LzOrderMode;
-import com.lz.base.protocol.LzParser;
 import com.lz.base.util.ConvertUtil;
-
-import java.util.Collections;
-import java.util.Optional;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 作者      : 刘朝
@@ -204,6 +195,7 @@ public class LzPacket {
         if (parser == null) {
             return null;
         }
+        System.out.println("pack " + parser.toString());
         byte len = parser.getCount();//数据长度
         byte[] bytes = new byte[2 + 1 + len];//创建一个
         //帧头
@@ -228,32 +220,22 @@ public class LzPacket {
 
         byte[] value = parser.getBytes();
         if (value != null) {
-            System.arraycopy(value, 0, data, 2, value.length);
+            System.arraycopy(value, 0, data, 1, value.length);
         }
         System.arraycopy(data, 0, bytes, 3, data.length);
         //crc 校准
         byte[] crc = parser.getCrc();
         System.arraycopy(crc, 0, bytes, bytes.length - 2, 2);
+        System.out.println("pack " + ConvertUtil.bytesToHexString(bytes));
         return bytes;
     }
 
-    LinkedBlockingQueue queue = new LinkedBlockingQueue();
-    private void getQueue(){
-
-    }
-
-    public interface IComplete {
-        void unPack(byte[] bytes);
-    }
 
     public static void main(String[] args) {
         LzParser parser = new LzParser();
-        parser.setHead(new byte[]{(byte) 0x5a, (byte) 0xa5});
-        parser.setOrder(0x80);
+        parser.setOrder(0x83);
         parser.setBytes(new byte[]{(byte) 0x11, (byte) 0x01,(byte) 0x32, (byte) 0x32});
-//        parser.setCount((byte) 6);
-        LzPacket packet = LzPacket.getmInstance();
-        packet.pack(parser);
+        LzPacket.getmInstance().pack(parser);
 
     }
 }
