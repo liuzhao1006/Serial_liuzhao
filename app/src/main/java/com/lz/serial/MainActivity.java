@@ -105,7 +105,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     case 0:
                         byte[] ledLight = LzUserOrder.getLedLight();
                         write(ledLight,0, ledLight.length);
-
                         Util.showToast(arr[position]+ position+ "  " + ConvertUtil.bytesToHexString(ledLight));
                         break;
                     case 1:
@@ -152,7 +151,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         String popupWindow = tvReadWriteMessage.getText().toString().trim();
                         LzUserOrder.setPopupWindow((byte)0x01);
                         break;
-
+                    case 10:
+                        LzUserOrder.setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xffff + 0x03), new byte[]{(byte) 0xF0, (byte) 0xFF});
+                        break;
                 }
             }
 
@@ -185,6 +186,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 write(pack, 0, pack.length);
                 break;
             case R.id.btn_send_two:
+                mList.clear();
+
                 break;
         }
     }
