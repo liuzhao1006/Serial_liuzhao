@@ -91,6 +91,10 @@ public class Util {
         Toast.makeText(getmContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
+    public static void showToast(String msg, int time) {
+        Toast.makeText(getmContext(), msg, time).show();
+    }
+
     public static GradientDrawable getGradientDrawable(int radius, int color) {
 
         GradientDrawable drawable = new GradientDrawable();

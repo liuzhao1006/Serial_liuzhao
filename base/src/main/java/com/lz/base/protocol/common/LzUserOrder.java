@@ -214,8 +214,8 @@ public class LzUserOrder {
      * @return 返回报文
      */
     public static byte[] showDialog(byte[] address, byte[] dialogId) {
-
-        return null;
+        byte[] bytes = new byte[]{(byte)0x5a,(byte)0xa5,(byte)05,(byte)0x80,(byte)0x4F,(byte)0x01,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
     }
 
     /**
@@ -362,7 +362,8 @@ public class LzUserOrder {
 
         System.out.println("int类型转换成byte数组去掉高位" + ConvertUtil.bytesToHexString(ConvertUtil.intToByteArray(0xffff + 0x03)));
 
-        System.out.println("设置文本颜色 " + ConvertUtil.bytesToHexString(setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xffff + 0x03), new byte[]{(byte) 0xF0, (byte) 0xFF})));
+        System.out.println("设置文本颜色 " + ConvertUtil.bytesToHexString(setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xffff + 0x03), new byte[]{(byte) 0xF0, (byte) 0x00, (byte) 0x00})));
+        System.out.println("弹窗设置 " + ConvertUtil.bytesToHexString(showDialog(null,null)));
     }
 
 }

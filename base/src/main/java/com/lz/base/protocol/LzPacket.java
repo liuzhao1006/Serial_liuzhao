@@ -1,5 +1,6 @@
 package com.lz.base.protocol;
 
+import com.lz.base.log.LogUtils;
 import com.lz.base.observe.LzObserve;
 import com.lz.base.observe.Observer;
 import com.lz.base.util.ConvertUtil;
@@ -121,17 +122,14 @@ public class LzPacket {
                 }
                 break;
             case LZ_ORDER://指令//接收到的正确的指令
-                if (b == (byte) LzOrderMode.READ_REGISTER
-                        || b == (byte) LzOrderMode.WRITE_REGISTER
-                        || b == (byte) LzOrderMode.READ_VARIABLES
-                        || b == (byte) LzOrderMode.WRITE_VARIABLES
-                        || b == (byte) LzOrderMode.WRITE_CURVE) {
-                    bytes[3] = b;//在这里需要做一件事, 就是再次初始化数据数组,条件是数据数组为空,并且长度大于3时才能够创建
+                if(isOrder(b)){
+                    LogUtils.i("获取到的指令是 " + b);
                     if (bData == null && bytes[2] > 0x03) {
                         bData = new byte[bytes[2] - 1 - 2];
                     }
                     lzParser = LZParser.LZ_DATA;
-                } else {//没有接收到正确的指令.跳转到错误状态去.
+                }else {
+                    //没有接收到正确的指令.跳转到错误状态去.
                     unPackError(LZParser.LZ_ERROR);
                 }
                 break;
@@ -176,13 +174,14 @@ public class LzPacket {
                 break;
             case LZ_COMPLETE://完成了 清空数据,将老数据丢到队列中去
                 LzParser message = new LzParser();
-                message.setOrder(bytes[3]);
+                message.setOrder(ConvertUtil.byteToInt(bytes[3]));
                 message.setBytes(bData);
                 message.setCrc(bCrc);
                 if (observe != null) {
                     observe.setMessage(message);
                     notifyMessage();
                 }
+                LogUtils.i("Lz_COMPLETE " + message.toString());
                 resetTest();
                 break;
             case LZ_ERROR://反正遇到问题了
@@ -191,6 +190,27 @@ public class LzPacket {
         }
     }
 
+    private boolean isOrder(byte b){
+        switch (b) {
+            case (byte) LzOrderMode.READ_REGISTER:
+                bytes[3] = (byte) LzOrderMode.READ_REGISTER;//在这里需要做一件事, 就是再次初始化数据数组,条件是数据数组为空,并且长度大于3时才能够创建
+                return true;
+            case (byte) LzOrderMode.WRITE_REGISTER:
+                bytes[3] = (byte) LzOrderMode.WRITE_REGISTER;//在这里需要做一件事, 就是再次初始化数据数组,条件是数据数组为空,并且长度大于3时才能够创建
+                return true;
+            case (byte) LzOrderMode.READ_VARIABLES:
+                bytes[3] = (byte) LzOrderMode.READ_VARIABLES;//在这里需要做一件事, 就是再次初始化数据数组,条件是数据数组为空,并且长度大于3时才能够创建
+                return true;
+            case (byte) LzOrderMode.WRITE_VARIABLES:
+                bytes[3] = (byte) LzOrderMode.WRITE_VARIABLES;//在这里需要做一件事, 就是再次初始化数据数组,条件是数据数组为空,并且长度大于3时才能够创建
+                return true;
+            case (byte) LzOrderMode.WRITE_CURVE:
+                bytes[3] = (byte) LzOrderMode.WRITE_CURVE;//在这里需要做一件事, 就是再次初始化数据数组,条件是数据数组为空,并且长度大于3时才能够创建
+                return true;
+            default:
+                return false;
+        }
+    }
     public byte[] pack(LzParser parser) {
         if (parser == null) {
             return null;

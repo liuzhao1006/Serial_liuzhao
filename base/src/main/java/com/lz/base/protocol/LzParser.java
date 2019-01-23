@@ -172,7 +172,7 @@ public class LzParser {
         return "LzParser{" +
                 "head=" + Arrays.toString(head) +
                 ", count=" + count +
-                ", order=" + order +
+                ", order=" + order+
                 ", bytes=" + Arrays.toString(bytes) +
                 ", crc=" + Arrays.toString(crc) +
                 ", type=" + type +
@@ -184,15 +184,20 @@ public class LzParser {
     public static void main(String[] args) {
         System.out.println("起始:"+System.currentTimeMillis());
         startTime = System.currentTimeMillis();
-
+        String msg = "5a a5 08 83 10 00 01 00 0f cf ef";
+        byte[] bytes = ConvertUtil.hexStringToBytes(msg);
+        LzParser parser = new LzParser();
+        parser.setOrder(0x83);
+        parser.setBytes(new byte[]{(byte)0x10,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x0f});
+        LzPacket.getmInstance().pack(parser);
         //测试,连续发送1000条数据,解析速度为492ms
-        for (int i = 0; i < 2000; i++) {
-            LzParser lzParser = new LzParser();
-            lzParser.setOrder(0x81);
-            lzParser.setBytes(new byte[]{(byte)0x00,(byte)0x01,(byte)0x01});
-            System.out.println( i + " -> " + ConvertUtil.bytes2String(LzPacket.getmInstance().pack(lzParser)));
-            LzPacket.getmInstance().pack(lzParser);
-        }
+//        for (int i = 0; i < 2000; i++) {
+//            LzParser lzParser = new LzParser();
+//            lzParser.setOrder(0x81);
+//            lzParser.setBytes(new byte[]{(byte)0x00,(byte)0x01,(byte)0x01});
+//            System.out.println( i + " -> " + ConvertUtil.bytes2String(LzPacket.getmInstance().pack(lzParser)));
+//            LzPacket.getmInstance().pack(lzParser);
+//        }
         System.out.println("结束:"+( System.currentTimeMillis() - startTime ));
     }
 }

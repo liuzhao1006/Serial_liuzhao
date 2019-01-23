@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         lzPacket = LzPacket.getmInstance();
         lzPacket.registMessage(voltage);
         //收到消息的地方.
-        voltage.setIVoltage(msg -> Util.runOnUiThread(() -> Util.showToast(msg.toString())));
+        voltage.setIVoltage(msg -> Util.runOnUiThread(() -> Util.showToast(msg.toString(), Toast.LENGTH_LONG)));
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             for (byte anArg0 : bytes) {
                 lzPacket.unPack(anArg0);
@@ -83,14 +83,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 readAdapter.notify(mList);
             }
         }));
-
         findViewById(R.id.tv_read_message).setOnClickListener(view -> {
             byte[] b = {(byte) 0x5A, (byte) 0XA5,
                     (byte) 0X04, (byte) 0X83, (byte) 0X11, (byte) 0X01, (byte) 0X01};
             Util.showToast(ConvertUtil.bytes2String(b));
             write(b, 0, b.length);
         });
-
         //spinner
         spinner = findViewById(R.id.spinner);
         String[] arr = this.getResources().getStringArray(R.array.arr);
@@ -100,51 +98,50 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 switch (position) {
                     case 0:
                         byte[] ledLight = LzUserOrder.getLedLight();
-                        write(ledLight,0, ledLight.length);
+                        write(ledLight);
                         Util.showToast(arr[position]+ position+ "  " + ConvertUtil.bytesToHexString(ledLight));
                         break;
                     case 1:
                         byte[] pageId = LzUserOrder.getPageId();
-                        write(pageId,0,pageId.length);
+                        write(pageId);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId));
                         break;
                     case 2:
                         byte[] bytes = LzUserOrder.setLedLight(ConvertUtil.intToByte(setLedLight+=5));
-                        write(bytes,0,bytes.length);
+                        write(bytes);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bytes));
                         break;
                     case 3:
                         byte[] pageId3 = LzUserOrder.setPageId(ConvertUtil.intToByte(pageIds++));
-                        write(pageId3,0,pageId3.length);
+                        write(pageId3);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId3));
                         break;
                     case 4:
                         byte[] bz = LzUserOrder.setBuzzer((byte) 0x20);
-                        write(bz,0,bz.length);
+                        write(bz);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bz));
                         break;
                     case 5:
                         byte[] reset = LzUserOrder.setReset();
-                        write(reset,0,reset.length);
+                        write(reset);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(reset));
                         break;
                     case 6:
                         byte[] calibration = LzUserOrder.setCalibration();
-                        write(calibration,0,calibration.length);
+                        write(calibration);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(calibration));
                         break;
                     case 7:
                         byte[] touch = LzUserOrder.setTouchFunction((byte) 0x00);
-                        write(touch,0,touch.length);
+                        write(touch);
                         Util.showToast(arr[position] + position + "  " + ConvertUtil.bytesToHexString(touch));
                         break;
                     case 8:
                         byte[] time = LzUserOrder.setCurRtcTime();
-                        write(time,0,time.length);
+                        write(time);
                         Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(time));
                         break;
                     case 9:
@@ -152,9 +149,42 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         LzUserOrder.setPopupWindow((byte)0x01);
                         break;
                     case 10:
-                        LzUserOrder.setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xffff + 0x03), new byte[]{(byte) 0xF0, (byte) 0xFF});
+                        byte[] color = LzUserOrder.setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xFFFF + 0x03), new byte[]{(byte) 0x82, (byte) 0x08});
+                        write(color);
+                        Util.showToast(arr[position]);
+                        break;
+                    case 11:
+                        byte[] setNumber = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x00}, 43);
+                        write(setNumber);
+                        Util.showToast(arr[position]);
+                        break;
+                    case 12:
+                        byte[] setNumber2 = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x01}, 55);
+                        write(setNumber2);
+                        Util.showToast(arr[position]);
+                        break;
+                    case 13:
+                        byte[] setNumber3 = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x00}, 60);
+                        write(setNumber3);
+                        byte[] setNumber4 = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x01}, 61);
+                        write(setNumber4);
+                        Util.showToast(arr[position]);
+                        break;
+                    case 14:
+                        //菜单弹出
+                        byte[] dialog = LzUserOrder.showDialog(null, null);
+                        write(dialog);
+                        Util.showToast(arr[position]);
+                        break;
+                    case 15:
+                        //隐藏菜单
+
+                        break;
+                    case 16:
+
                         break;
                 }
+
             }
 
             @Override
@@ -183,7 +213,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 LogUtils.i(msg.toString());
                 byte[] pack = lzPacket.pack(msg);
                 LogUtils.i("onClick R.id.btn_send_one " + ConvertUtil.bytes2String(pack));
-                write(pack, 0, pack.length);
+                write(pack);
                 break;
             case R.id.btn_send_two:
                 mList.clear();
@@ -360,6 +390,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     break;
             }
         }
+    }
+
+    public void write(byte[] data){
+        write(data,0,data.length);
     }
 
     public void write(byte[] data, int off, int len) {
