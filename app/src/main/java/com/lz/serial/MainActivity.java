@@ -172,13 +172,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         break;
                     case 14:
                         //菜单弹出
-                        byte[] dialog = LzUserOrder.showDialog(null, null);
+                        byte[] dialog = LzUserOrder.showDialog((byte)0x01);
                         write(dialog);
                         Util.showToast(arr[position]);
                         break;
                     case 15:
                         //隐藏菜单
-
+                        byte[] hide = LzUserOrder.hideDialog((byte)0x02);
+                        write(hide);
+                        Util.showToast(arr[position]);
                         break;
                     case 16:
 

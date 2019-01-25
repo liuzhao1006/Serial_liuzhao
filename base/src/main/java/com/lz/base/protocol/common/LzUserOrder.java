@@ -4,6 +4,7 @@ import com.lz.base.protocol.LzCrcUtils;
 import com.lz.base.protocol.LzOrderMode;
 import com.lz.base.util.ConvertUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.security.PublicKey;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -158,6 +159,7 @@ public class LzUserOrder {
         return setValue(order, address, value);
     }
 
+
     /**
      * 设置int类型值
      *
@@ -172,6 +174,26 @@ public class LzUserOrder {
         return setValue(order, address, value);
     }
 
+    /**
+     * 读取地址下的值
+     * @param address 地址
+     * @return 返回报文
+     * 示例
+     * 发送指令：5a a5 06 83 10 00 01 e9 a5
+     * 接收指令：5A A5 08 83 10 00 01 00 0F CF EF
+     */
+    public static byte[] getNumbericValue(byte[] address){
+        int count =  1 + address.length + 1 + 2;
+        byte[] bytes = new byte[2+ 1 +count];
+        bytes[0] = LzConstants.HEAD_PER;
+        bytes[1] = LzConstants.HEAD_END;
+        bytes[2] = ConvertUtil.intToByte(count);
+        bytes[3] = ConvertUtil.intToByte(LzOrderMode.READ_VARIABLES);
+        System.arraycopy(address, 0, bytes, 4, address.length);
+        bytes[4 + address.length] = ConvertUtil.intToByte(0x01);
+        return getCrc(bytes);
+    }
+
 
     /**
      * 设置文本变量
@@ -180,7 +202,12 @@ public class LzUserOrder {
      * @return 返回报文
      */
     public static byte[] setTextType(byte order, byte[] address, String text) {
-        return setValue(order, address, ConvertUtil.hexStringToBytes(ConvertUtil.str2HexStr(text)));
+        try {
+            return setValue(order, address, text.getBytes("GBK"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -210,11 +237,20 @@ public class LzUserOrder {
      * 操作哪个变量,需要跳转到哪个页面
      *
      * @param address  点击的地址
-     * @param dialogId 跳转到id的地址
      * @return 返回报文
      */
-    public static byte[] showDialog(byte[] address, byte[] dialogId) {
-        byte[] bytes = new byte[]{(byte)0x5a,(byte)0xa5,(byte)05,(byte)0x80,(byte)0x4F,(byte)0x01,(byte)0x00,(byte)0x00};
+    public static byte[] showDialog(byte address) {
+        byte[] bytes = new byte[]{(byte)0x5a,(byte)0xa5,(byte)0x05, (byte) LzOrderMode.WRITE_REGISTER,(byte)0x4f,address,(byte)0x00,(byte)0x00};
+        return getCrc(bytes);
+    }
+
+    /**
+     * 隐藏菜单功能，这个做法很骚情，一般人还真想不到。
+     * @param address 发送键值，键控
+     * @return
+     */
+    public static byte[] hideDialog( byte address) {
+        byte[] bytes = new byte[]{(byte)0x5a,(byte)0xa5,(byte)0x05, (byte) LzOrderMode.WRITE_REGISTER,(byte)0x4f,address,(byte)0x00,(byte)0x00};
         return getCrc(bytes);
     }
 
@@ -297,7 +333,7 @@ public class LzUserOrder {
         byte[] bytes = new byte[2 + 1 + count];
         bytes[0] = LzConstants.HEAD_PER;
         bytes[1] = LzConstants.HEAD_END;
-        bytes[2] = (byte) count;
+        bytes[2] = ConvertUtil.intToByte(count);
         bytes[3] = order;
         System.arraycopy(address, 0, bytes, 4, addressLength);
         System.arraycopy(value, 0, bytes, 4 + addressLength, numberLength);
@@ -339,15 +375,13 @@ public class LzUserOrder {
         System.arraycopy(crc, 0, b, b.length - 2, 2);
 //        System.out.println("计算crc校验值 " + ConvertUtil.bytesToHexString(b));
         return b;
-
-
     }
 
     public static void main(String[] args) {
         System.out.println("读取背光亮度值 " + ConvertUtil.bytes2String(getLedLight()));
         System.out.println("发送读取当前页面编号指令 " + ConvertUtil.bytes2String(getPageId()));
         System.out.println("发送设置背光亮度 " + ConvertUtil.bytesToHexString(setLedLight((byte) 0x30)));
-        System.out.println("发送设置页面切换指令 " + ConvertUtil.bytesToHexString(setPageId((byte) 0x10)));
+        System.out.println("发送设置页面切换指令 " + ConvertUtil.bytesToHexString(setPageId((byte) 0x04)));
         System.out.println("启动蜂鸣器 " + ConvertUtil.bytesToHexString(setBuzzer((byte) 0x10)));
         System.out.println("复位操作 " + ConvertUtil.bytesToHexString(setReset()));
         System.out.println("触摸屏校准 " + ConvertUtil.bytesToHexString(setCalibration()));
@@ -357,13 +391,20 @@ public class LzUserOrder {
         System.out.println("crc " + ConvertUtil.bytesToHexString(getCrc(new byte[]{(byte) 0X5A, (byte) 0XA5, (byte) 0X05, (byte) 0X81, (byte) 0X20, (byte) 0X07, (byte) 0x00, (byte) 0x00})));
         System.out.println("设置int类型值 " + ConvertUtil.bytes2String(setNumbericIntType((byte) LzOrderMode.READ_REGISTER, new byte[]{(byte) 0x01, (byte) 0x00}, 5)));
         System.out.println("设置float类型值 " + ConvertUtil.bytes2String(setNumbericFloatType((byte) LzOrderMode.READ_REGISTER, new byte[]{(byte) 0x01, (byte) 0x00}, 5.5f)));
-        System.out.println("设置文本类型值 " + ConvertUtil.bytes2String(setTextType((byte) LzOrderMode.READ_REGISTER, new byte[]{(byte) 0x01, (byte) 0x00}, "刘朝")));
+        System.out.println("设置文本类型值 " + ConvertUtil.bytes2String(setTextType((byte) LzOrderMode.WRITE_VARIABLES, new byte[]{(byte) 0x12, (byte) 0x34}, "刘朝")));
         System.out.println("------------------");
-
         System.out.println("int类型转换成byte数组去掉高位" + ConvertUtil.bytesToHexString(ConvertUtil.intToByteArray(0xffff + 0x03)));
-
         System.out.println("设置文本颜色 " + ConvertUtil.bytesToHexString(setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xffff + 0x03), new byte[]{(byte) 0xF0, (byte) 0x00, (byte) 0x00})));
-        System.out.println("弹窗设置 " + ConvertUtil.bytesToHexString(showDialog(null,null)));
+        System.out.println("弹窗设置 " + ConvertUtil.bytesToHexString(showDialog((byte)0x01)));
+        System.out.println("隐藏菜单 " + ConvertUtil.bytesToHexString(hideDialog( (byte)0x02)));
+        setValue((byte)0x84, new byte[]{(byte)0x01, (byte)0x00},new byte[]{(byte)0x64, (byte)0x00, (byte)0x32, (byte)0x01,
+                (byte)0x00, (byte)0x00, (byte)0x50, (byte)0x02, (byte)0x00,
+                (byte)0x00, (byte)0x64});
+        System.out.println("显示曲线 " + ConvertUtil.bytesToHexString(setValue((byte)0x84, new byte[]{(byte)0x01, (byte)0x00},new byte[]{(byte)0x64, (byte)0x00, (byte)0x32, (byte)0x01,
+                (byte)0x00, (byte)0x00, (byte)0x50, (byte)0x02, (byte)0x00,
+                (byte)0x00, (byte)0x64})));
+        System.out.println("读取值 " + ConvertUtil.bytesToHexString(getNumbericValue(new byte[]{(byte)0x10, (byte)0x00})));
     }
+
 
 }
