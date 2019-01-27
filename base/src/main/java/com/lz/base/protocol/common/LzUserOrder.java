@@ -254,6 +254,29 @@ public class LzUserOrder {
         return getCrc(bytes);
     }
 
+
+    /**
+     * 显示矩形，并填充颜色。 有点小问题。
+     * @return
+     */
+    public static byte[] showRectangle(){
+        byte[] bytes = new byte[]{
+                (byte)0x5a,(byte)0xa5,//针头
+                (byte)0x15,(byte)0x82,//长度，写入页面指令
+                (byte)0x19,(byte)0x01,//变量地址
+                (byte)0x00,(byte)0x04,//矩形
+                (byte)0x02,(byte)0x12,//
+                (byte)0x00,(byte)0x6d,//左上坐标
+                (byte)0x02,(byte)0x85,
+                (byte)0x00,(byte)0x59,//右下坐标
+                (byte)0x00,(byte)0x6d,
+                (byte)0x02,(byte)0x85,//显示坐标
+                (byte)0xf8,(byte)0x00,//显示颜色
+                (byte)0x00,(byte)0x00,//crc校验
+        };
+        return getCrc(bytes);
+    }
+
     /**
      * 设置当前时间给屏幕
      *
@@ -404,7 +427,6 @@ public class LzUserOrder {
                 (byte)0x00, (byte)0x00, (byte)0x50, (byte)0x02, (byte)0x00,
                 (byte)0x00, (byte)0x64})));
         System.out.println("读取值 " + ConvertUtil.bytesToHexString(getNumbericValue(new byte[]{(byte)0x10, (byte)0x00})));
+        System.out.println("设置矩形 " + ConvertUtil.bytesToHexString(showRectangle()));
     }
-
-
 }
