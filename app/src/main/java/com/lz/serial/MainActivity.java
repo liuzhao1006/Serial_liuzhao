@@ -29,6 +29,7 @@ import com.lz.base.protocol.common.LzUserOrder;
 import com.lz.base.util.ConvertUtil;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.IReadCallBack;
+import com.lz.serial.message.LzTestMessage;
 import com.lz.serial.message.LzVoltage;
 import com.lz.serial.service.SerialService;
 import com.lz.serial.utils.Util;
@@ -52,6 +53,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private LzVoltage voltage;
     private LzPacket lzPacket;
     private Spinner spinner;
+    private LzTestMessage testMessage;
 
     @Override
     protected int getLayoutId() {
@@ -62,7 +64,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void initView(Bundle savedInstanceState) {
         initUsb();
         voltage = new LzVoltage();
-
+        testMessage = new LzTestMessage();
         tvTitle = findViewById(R.id.tv_title);
         tvAdressMessage = findViewById(R.id.tv_adress_message);
         tvReadWriteMessage = findViewById(R.id.tv_read_write_message);
@@ -72,8 +74,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.btn_send_two).setOnClickListener(this);
         lzPacket = LzPacket.getmInstance();
         lzPacket.registMessage(voltage);
+        lzPacket.registMessage(testMessage);
         //收到消息的地方.
-        voltage.setIVoltage(msg -> Util.runOnUiThread(() -> Util.showToast(msg.toString())));
+        voltage.setIVoltage(msg -> Util.runOnUiThread(() -> {
+            Util.showToast("LzVoltage " + msg.toString());
+            LogUtils.i("LzVoltage " + msg.toString());
+        }));
+        testMessage.setIMessage(msg -> {
+            Util.showToast("LzTestMessage " + msg.toString());
+            LogUtils.i("LzTestMessage " + msg.toString());
+        });
+
         setiReadCallBack(bytes -> Util.runOnUiThread(() -> {
             for (byte anArg0 : bytes) {
                 lzPacket.unPack(anArg0);
@@ -170,7 +181,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.btn_send_one:
                 LzParser msg = new LzParser();
-                //order
                 String order = tvReadWriteMessage.getText().toString().trim();
                 msg.setOrder(0x82);
                 String adress = tvAdressMessage.getText().toString().trim();
@@ -210,6 +220,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onStop();
         onUsbPause();
         lzPacket.unRegistMessage(voltage);
+        lzPacket.unRegistMessage(testMessage);
     }
 
     private static IReadCallBack iReadCallBack;
@@ -326,7 +337,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         serialService.requestPermission();
     }
 
-
     private static class MyHandler extends Handler {
         private final WeakReference<MainActivity> mActivity;
 
@@ -369,6 +379,4 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         }
     }
-
-
 }
