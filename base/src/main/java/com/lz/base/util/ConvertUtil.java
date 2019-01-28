@@ -174,7 +174,12 @@ public class ConvertUtil {
                 (byte) (a & 0xFF)
         };
     }
-
+    public static byte[] intToSubByteArray(int a) {
+        return new byte[] {
+                (byte) ((a >> 8) & 0xFF),
+                (byte) (a & 0xFF)
+        };
+    }
     private static ByteBuffer longBuffer = ByteBuffer.allocate(8);
 
     //byte 数组与 long 的相互转换
