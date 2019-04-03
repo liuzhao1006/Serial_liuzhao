@@ -7,10 +7,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.hardware.usb.UsbDevice;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,6 +36,7 @@ import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.IReadCallBack;
 import com.lz.serial.message.LzTestMessage;
 import com.lz.serial.message.LzVoltage;
+import com.lz.serial.service.OnlineService;
 import com.lz.serial.service.SerialService;
 import com.lz.serial.utils.Util;
 
@@ -54,6 +60,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private LzPacket lzPacket;
     private Spinner spinner;
     private LzTestMessage testMessage;
+
+    private Handler handler;
 
     @Override
     protected int getLayoutId() {
@@ -206,10 +214,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             }
         });
+        Intent startSrv = new Intent(this.getApplicationContext(), OnlineService.class);
+        this.getApplicationContext().startService(startSrv);
+    }
+
+
+    private static final int REQUEST_CODE_WRITE_SETTINGS = 1;
+    private void requestWriteSettings() {
+        Intent intent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS );
+        }
+
     }
 
     private int setLedLight = 5 ;
     private int pageIds = 5 ;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -229,12 +252,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 write(pack);
                 break;
             case R.id.btn_send_two:
-                mList.clear();
+                // mList.clear();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if(!Settings.System.canWrite(this)){
+                        requestWriteSettings();
+                    }else {
+                        startActivity(new Intent(this, ItemActivity.class));
 
+                    }
+                }
                 break;
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_WRITE_SETTINGS) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.System.canWrite(this)) {
+                    startActivity(new Intent(this, ItemActivity.class));
+                }
+            }
+        }
+    }
 
     private void initListView() {
         lvReadView = findViewById(R.id.lv_read_view);

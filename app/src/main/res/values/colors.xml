@@ -7,4 +7,21 @@
     <color name="fab_color_1_muted">#ff8080</color>
     <color name="fab_color_2">#9c27b0</color>
     <color name="fab_color_2_muted">#a56ab0</color>
+    <color name="selector_view_pager_indicator">#2e2e37</color>
+
+    <color name="lz_blue">#0C83F7</color>
+    <color name="lz_blue_dosage">#65B3FF</color>
+    <color name="lz_background">#E8E9EE</color>
+    <color name="lz_title_text">#3E4D6A</color>
+    <color name="lz_title_text_2">#7A8295</color>
+    <color name="lz_switch_button">#0C83F7</color>
+    <color name="lz_text">#0C83F7</color>
+    <color name="lz_view">#D8DCE8</color>
+    <color name="lz_black_view">#666666</color>
+    <color name="lz_unselect">#A0A6B4</color>
+    <color name="lz_unselect_content">#66A0A6B4</color>
+    <color name="lz_dialog_background">#aa000000</color>
+    <color name="lz_yellow">#FFE00D</color>
+    <color name="lz_green">#56E507</color>
+    <color name="lz_red">#ff0000</color>
 </resources>

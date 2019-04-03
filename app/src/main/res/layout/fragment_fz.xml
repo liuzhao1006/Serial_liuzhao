@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.lz.base.view.LzScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_status_fz"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:contentDescription="状态"
+                android:scaleType="centerInside"
+                android:src="@mipmap/status_normal" />
+
+            <TextView
+                android:id="@+id/tv_title_fz"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="32sp" />
+
+            <View
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@android:color/transparent" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:text="@string/stop_condition"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="28sp" />
+
+        <View style="@style/Test_data_view" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/lowerVoltageLimit" />
+
+            <TextView
+                android:id="@+id/tv_lower_voltage_limit_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/dischargeCapacity" />
+
+            <TextView
+                android:id="@+id/tv_discharge_capacity_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/dischargeTime" />
+
+            <TextView
+                android:id="@+id/tv_discharge_time_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:text="@string/test_infomation"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="28sp" />
+
+        <View style="@style/Test_data_view" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/currentVoltageSet" />
+
+            <TextView
+                android:id="@+id/tv_current_voltage_set_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/currentDischargeCurrent" />
+
+            <TextView
+                android:id="@+id/tv_current_discharge_current_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                android:id="@+id/tv_0086_jk"
+                style="@style/Test_Data"
+                android:text="@string/currentReleaseCapacity" />
+
+            <TextView
+                android:id="@+id/tv_current_release_capacity_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/currentDischargeDuration" />
+
+            <TextView
+                android:id="@+id/tv_current_discharge_duration_fz"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent" />
+
+    </LinearLayout>
+
+</com.lz.base.view.LzScrollView>

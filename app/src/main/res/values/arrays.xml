@@ -21,4 +21,19 @@
         <item>绘制矩形</item>
     </string-array>
 
+    <string-array name="fragment">
+        <item>监测离线充电->JC</item>
+        <item>在线监测->JK</item>
+        <item>离线充电->CD</item>
+        <item>监测放电->JF</item>
+        <item>监测离线充放->JCF</item>
+        <item>放电负载->FZ</item>
+        <item>充放->CF</item>
+        <item>容量评估->RLPG</item>
+        <item>在线监测充放电->DC</item>
+        <item>单体充电->HHY_C</item>
+        <item>单体放电->HHY_F</item>
+        <item>单体充放电->HHY_CF</item>
+    </string-array>
+
 </resources>

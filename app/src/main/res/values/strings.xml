@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Serial</string>
+    <string name="app_name">吉之龙</string>
     <string name="tv_title">Usb连接</string>
     <string name="tv_read_message">读取数据</string>
-    <string name="tv_write_message" >写入数据, 所有输入的内容均为十六进制</string>
+    <string name="tv_write_message">写入数据, 所有输入的内容均为十六进制</string>
     <string name="tv_header_message">地址</string>
     <string name="tv_read_write_message">读写模式 只有5种, 80,81,82,83,84</string>
     <string name="tv_content_message">读写内容, 值</string>
@@ -19,4 +19,72 @@
 
         ]]>
     </string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="bell_tips">请长按设置按钮5秒钟，听到语音提示后点击下一步进行操作！</string>
+    <string name="device_id">设备ID:</string>
+    <string name="wifi_ssid">WIFI-SSID:</string>
+    <string name="wifi_pwd">WIFI密码:</string>
+    <string name="next">下一步</string>
+    <string name="sure">确定</string>
+    <string name="input_pwd_hint">请输入密码</string>
+    <string name="wait_moment">操作进行中，请稍后</string>
+
+    <string name="tv_0082_jk">整组电压下(上)限</string>
+    <string name="tv_0083_jk">单体电压下(上)限</string>
+    <string name="tv_0084_jk">整组电压</string>
+    <string name="tv_0085_jk">充放电电流</string>
+    <string name="tv_0086_jk">充放电容量</string>
+    <string name="tv_0087_jk">监测时长</string>
+
+    <string name="tv_032D_jc">充入容量</string>
+    <string name="tv_032e_jc">充电时长</string>
+    <string name="tv_033b_jc">当前整组电压</string>
+    <string name="tv_033c_jc">当前充电电流</string>
+    <string name="tv_033d_jc">当前充入容量</string>
+    <string name="tv_033e_jc">当前充入时长</string>
+    <string name="tv_034e_jc">告警信息</string>
+    <string name="iv_wifi_connect">连接服务器</string>
+    <string name="tv_location_detail_message">定位详细信息</string>
+    <string name="test_infomation">测试信息</string>
+    <string name="current_voltage">当前电压</string>
+    <string name="stop_condition">终止条件</string>
+    <string name="chargingCapacity">充入容量</string>
+    <string name="charging_time">充电时长</string>
+    <string name="monomerVoltage">单体电压</string>
+    <string name="currentVoltageSet">当前整组电压</string>
+    <string name="currentChargingCurrent">当前充电电流</string>
+    <string name="currentFillingCapacity">当前充入容量</string>
+    <string name="currentChargingTime">当前充电时长</string>
+    <string name="chargingState">充电状态</string>
+    <string name="lowerLimitMonomerVoltage">单体电压下限</string>
+    <string name="lowerVoltageLimit">整组电压下限</string>
+    <string name="dischargeTime">放电时长</string>
+    <string name="currentDischargeCurrent">当前放电电流</string>
+    <string name="currentReleaseCapacity">当前放出容量</string>
+    <string name="currentDischargeDuration">当前放电时长</string>
+    <string name="CurrentRotation">当前轮次</string>
+    <string name="currentChargingDischargingCurrent">当前充放电流</string>
+    <string name="currentFillingTime">当前充放时长</string>
+    <string name="currentChargingCapacity">当前充放容量</string>
+    <string name="test_status">测试状态</string>
+    <string name="pc_room">机房名称</string>
+    <string name="wholeSetType">整组类型</string>
+    <string name="monomerType">单体类型</string>
+    <string name="batteryPackNumber">电池组数</string>
+    <string name="numberNodesPerGroup">每组节数</string>
+    <string name="nominalCapacity">标称容量</string>
+    <string name="monomerSorting">单体排序</string>
+    <string name="testTime">测试时间</string>
+    <string name="referenceInternalResistance">参考内阻</string>
+    <string name="countDown">倒计时</string>
+    <string name="currentBusVoltage">当前母线电压</string>
+    <string name="currentBatteryVoltage">当前电池电压</string>
+    <string name="voltageLowerLimit">电压下限</string>
+    <string name="dischargeCapacity">放出容量</string>
+    <string name="currentVoltage">当前电压</string>
+    <string name="currentCurrent">当前电流</string>
+    <string name="currentWorkingHours">当前工作时长</string>
+
+
 </resources>

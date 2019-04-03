@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.lz.base.view.LzScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_status_rlpg"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:contentDescription="状态"
+                android:scaleType="centerInside"
+                android:src="@mipmap/status_normal" />
+
+            <TextView
+                android:id="@+id/tv_title_rlpg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="32sp" />
+
+            <View
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@android:color/transparent" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:text="@string/test_status"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="28sp" />
+
+        <View style="@style/Test_data_view" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/pc_room" />
+
+            <TextView
+                android:id="@+id/tv_pc_room_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/wholeSetType" />
+
+            <TextView
+                android:id="@+id/tv_whole_set_type_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/monomerType" />
+
+            <TextView
+                android:id="@+id/tv_monomer_type_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/batteryPackNumber" />
+
+            <TextView
+                android:id="@+id/tv_battery_pack_number_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/numberNodesPerGroup" />
+
+            <TextView
+                android:id="@+id/tv_number_nodes_per_group_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/nominalCapacity" />
+
+            <TextView
+                android:id="@+id/tv_nominal_capacity_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/monomerSorting" />
+
+            <TextView
+                android:id="@+id/tv_monomer_sorting_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/testTime" />
+
+            <TextView
+                android:id="@+id/tv_test_time_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/referenceInternalResistance" />
+
+            <TextView
+                android:id="@+id/tv_reference_internal_resistance_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view_content" />
+
+        <LinearLayout style="@style/Test_data_parent">
+
+
+            <TextView
+                style="@style/Test_Data"
+                android:text="@string/countDown" />
+
+            <TextView
+                android:id="@+id/tv_count_down_rlpg"
+                style="@style/Test_Data_Value" />
+
+        </LinearLayout>
+
+        <View style="@style/Test_data_view" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent" />
+
+    </LinearLayout>
+
+</com.lz.base.view.LzScrollView>
