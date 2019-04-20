@@ -1,31 +1,19 @@
 package com.lz.serial.net;
 
 import com.lz.base.log.LogUtils;
-import com.lz.serial.ItemActivity;
-import com.lz.serial.fragment.bean.JcBean;
 
-import net.qiujuer.library.clink.box.StringReceivePacket;
-import net.qiujuer.library.clink.core.Connector;
-import net.qiujuer.library.clink.core.IoContext;
-import net.qiujuer.library.clink.core.Packet;
-import net.qiujuer.library.clink.core.ReceivePacket;
-import net.qiujuer.library.clink.core.SendPacket;
-import net.qiujuer.library.clink.impl.IoSelectorProvider;
-import net.qiujuer.library.clink.impl.SchedulerImpl;
-import net.qiujuer.library.clink.utils.CloseUtils;
+import com.lz.base.clink.box.StringReceivePacket;
+import com.lz.base.clink.core.Connector;
+import com.lz.base.clink.core.Packet;
+import com.lz.base.clink.core.ReceivePacket;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -55,7 +43,7 @@ public class TcpClient extends Connector {
         socket.setSendBufferSize(256);
         // 连接
         SocketAddress inetSocketAddress = new InetSocketAddress(Inet4Address.getByName(address), port);
-        LogUtils.i(((InetSocketAddress) inetSocketAddress).getAddress().getHostAddress());
+        LogUtils.i("TcpClient: "+((InetSocketAddress) inetSocketAddress).getAddress().getHostAddress());
         socketChannel.connect(inetSocketAddress );
         // 开启
         setup(socketChannel);
@@ -75,8 +63,10 @@ public class TcpClient extends Connector {
     @Override
     protected void onReceivedPacket(ReceivePacket packet) {
         super.onReceivedPacket(packet);
+        LogUtils.i("onReceivedPacket连接了," + packet.entity());
         if (packet.type() == Packet.TYPE_MEMORY_STRING) {
             String entity = ((StringReceivePacket) packet).entity();
+            LogUtils.i(entity);
             ConnectorInfo info = new ConnectorInfo(entity);
             mMessageArrivedListener.onNewMessageArrived(info);
         }

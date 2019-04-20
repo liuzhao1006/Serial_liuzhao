@@ -1,4 +1,4 @@
-package com.lz.serial;
+package com.lz.serial.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -35,6 +35,8 @@ import com.amap.api.location.AMapLocationListener;
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
 import com.lz.base.view.dialog.AlertDialog;
+import com.lz.serial.R;
+import com.lz.serial.SerialApp;
 import com.lz.serial.fragment.bean.CDBean;
 import com.lz.serial.fragment.bean.CFBean;
 import com.lz.serial.fragment.bean.DCBean;
@@ -64,20 +66,19 @@ import com.lz.serial.message.event.RLPGMessageEvent;
 import com.lz.serial.net.ConnectorInfo;
 import com.lz.serial.net.Contracts;
 import com.lz.serial.net.TcpClient;
-import com.lz.serial.ui.ScanWifiActivity;
 import com.lz.serial.utils.Util;
 import com.lz.serial.widget.CustomViewPager;
 import com.lz.serial.widget.PopupWindowUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
-import net.qiujuer.library.clink.core.Connector;
-import net.qiujuer.library.clink.core.IoContext;
-import net.qiujuer.library.clink.core.ScheduleJob;
-import net.qiujuer.library.clink.core.schedule.IdleTimeoutScheduleJob;
-import net.qiujuer.library.clink.impl.IoSelectorProvider;
-import net.qiujuer.library.clink.impl.SchedulerImpl;
-import net.qiujuer.library.clink.utils.CloseUtils;
+import com.lz.base.clink.core.Connector;
+import com.lz.base.clink.core.IoContext;
+import com.lz.base.clink.core.ScheduleJob;
+import com.lz.base.clink.core.schedule.IdleTimeoutScheduleJob;
+import com.lz.base.clink.impl.IoSelectorProvider;
+import com.lz.base.clink.impl.SchedulerImpl;
+import com.lz.base.clink.utils.CloseUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -414,7 +415,9 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                     if (client != null) {
                         client.send(HHYCFBean.getStatusBean(HHYCFBean.getHHYCFBean()));
                     }
-                    LogUtils.i("message send finish!!");
+                    if(client != null){
+                        LogUtils.i("message send finish!!");
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -466,16 +469,12 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 LogUtils.i("JCF " + info.getValue());
                 EventBus.getDefault().post(new JCFMessageEvent(info.getValue()));
                 break;
-            case JNF:
-                break;
+
             case DJCF:
                 LogUtils.i("DJCF " + info.getValue());
                 EventBus.getDefault().post(new DCMessageEvent(info.getValue()));
                 break;
-            case JNCF:
-                break;
-            case RJCF:
-                break;
+
             case HHYC:
                 LogUtils.i("HHYC " + info.getValue());
                 EventBus.getDefault().post(new HHYCMessageEvent(info.getValue()));
@@ -489,7 +488,7 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 EventBus.getDefault().post(new HHYCFMessageEvent(info.getValue()));
                 break;
             case RLPG:
-                LogUtils.i("JCF " + info.getValue());
+                LogUtils.i("RLPG " + info.getValue());
                 EventBus.getDefault().post(new RLPGMessageEvent(info.getValue()));
                 break;
             case ERROR:

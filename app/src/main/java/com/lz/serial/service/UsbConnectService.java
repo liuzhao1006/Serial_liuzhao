@@ -23,9 +23,9 @@ import com.lz.usbserial.driver.UsbSerialInterface;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SerialService extends Service {
+public class UsbConnectService extends Service {
 
-    public static final String TAG = "SerialService";
+    public static final String TAG = "UsbConnectService";
     public static final String ACTION_USB_READY = "com.felhr.connectivityservices.USB_READY";
     public static final String ACTION_USB_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED";
     public static final String ACTION_USB_DETACHED = "android.hardware.usb.action.USB_DEVICE_DETACHED";
@@ -137,7 +137,7 @@ public class SerialService extends Service {
     public void onCreate() {
         this.context = this;
         serialPortConnected = false;
-        SerialService.SERVICE_CONNECTED = true;
+        UsbConnectService.SERVICE_CONNECTED = true;
         setFilter();
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
@@ -157,7 +157,7 @@ public class SerialService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SerialService.SERVICE_CONNECTED = false;
+        UsbConnectService.SERVICE_CONNECTED = false;
         unregisterReceiver(usbReceiver);
     }
 
@@ -237,8 +237,8 @@ public class SerialService extends Service {
     }
 
     public class UsbBinder extends Binder {
-        public SerialService getService() {
-            return SerialService.this;
+        public UsbConnectService getService() {
+            return UsbConnectService.this;
         }
     }
 

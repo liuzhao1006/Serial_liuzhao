@@ -54,30 +54,18 @@ public class ConnectorInfo {
                     value = bean.content;
                     break;
                 case 9:
-                    messageType = MessageType.JC;
-                    value = bean.content;
-                    break;
-                case 10:
-                    messageType = MessageType.JC;
-                    value = bean.content;
-                    break;
-                case 11:
-                    messageType = MessageType.DJCF;
-                    value = bean.content;
-                    break;
-                case 12:
                     messageType = MessageType.RLPG;
                     value = bean.content;
                     break;
-                case 13:
+                case 10:
                     messageType = MessageType.HHYC;
                     value = bean.content;
                     break;
-                case 14:
+                case 11:
                     messageType = MessageType.HHYF;
                     value = bean.content;
                     break;
-                case 15:
+                case 12:
                     messageType = MessageType.HHYCF;
                     value = bean.content;
                     break;
@@ -106,6 +94,6 @@ public class ConnectorInfo {
 
 
     public enum MessageType {
-        ERROR, JC, JK, CF, CD, FZ, JCF, JF, JNF, JNCF, RJCF, DJCF, RLPG, HHYC,HHYF,HHYCF,
+        ERROR, JC, JK, CF, CD, FZ, JCF, JF, DJCF,RLPG, HHYC,HHYF,HHYCF,
     }
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.threader.ThreadActivity">
+    <Button
+        android:layout_width="40dp"
+        android:onClick="start"
+        android:id="@+id/btn_start"
+        android:layout_height="40dp" />
+
+    <Button
+        android:id="@+id/btn_forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/iv_video"
+        android:layout_alignTop="@+id/v_rocker"
+        android:layout_marginStart="358dp"
+        android:layout_marginTop="1dp"
+        android:onClick="forward"
+        android:text="前进" />
+
+    <ImageView
+        android:id="@+id/iv_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
+
+    <com.lz.serial.widget.RockerView
+        android:id="@+id/v_rocker"
+        android:layout_width="188dp"
+        android:layout_height="186dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="19dp"
+        app:areaBackground="@drawable/default_area_bg"
+        app:rockerBackground="@drawable/default_rocker_bg"
+        app:rockerRadius="30dp" />
+
+    <Button
+        android:id="@+id/btn_left_turn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/iv_video"
+        android:layout_alignTop="@+id/btn_forward"
+        android:layout_alignBottom="@+id/btn_back_off"
+        android:layout_marginStart="246dp"
+        android:layout_marginTop="69dp"
+        android:layout_marginBottom="66dp"
+        android:onClick="leftTurn"
+        android:text="左转" />
+
+    <Button
+        android:id="@+id/btn_back_off"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_forward"
+        android:layout_alignStart="@+id/btn_forward"
+        android:layout_alignEnd="@+id/btn_forward"
+        android:layout_alignBottom="@+id/v_rocker"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="87dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="2dp"
+        android:onClick="backOff"
+        android:text="后退" />
+
+    <Button
+        android:id="@+id/btn_right_turn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btn_left_turn"
+        android:layout_alignEnd="@+id/iv_video"
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="37dp"
+        android:layout_toEndOf="@+id/btn_forward"
+        android:onClick="rightTurn"
+        android:text="右转" />
+
+</RelativeLayout>

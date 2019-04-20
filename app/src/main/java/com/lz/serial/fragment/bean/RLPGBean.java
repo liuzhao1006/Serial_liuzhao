@@ -98,7 +98,7 @@ public class RLPGBean extends BaseBean {
     public static String getStatusBean(String content){
 
         StatusBean bean = new StatusBean();
-        bean.code = 12;
+        bean.code = 9;
         bean.msg = "消息正确";
         bean.content = content;
         return JSON.toJSONString(bean);

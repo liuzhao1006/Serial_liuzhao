@@ -1,4 +1,4 @@
-package com.lz.serial;
+package com.lz.serial.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -27,17 +27,18 @@ import android.widget.Toast;
 
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
-import com.lz.base.protocol.LzCrcUtils;
 import com.lz.base.protocol.LzPacket;
 import com.lz.base.protocol.LzParser;
 import com.lz.base.protocol.common.LzUserOrder;
 import com.lz.base.util.ConvertUtil;
+import com.lz.serial.R;
 import com.lz.serial.adapter.ReadAdapter;
 import com.lz.serial.inter.IReadCallBack;
 import com.lz.serial.message.LzTestMessage;
 import com.lz.serial.message.LzVoltage;
-import com.lz.serial.service.OnlineService;
-import com.lz.serial.service.SerialService;
+import com.lz.serial.service.TcpConnectService;
+import com.lz.serial.service.UsbConnectService;
+import com.lz.serial.ui.threader.ThreadActivity;
 import com.lz.serial.utils.Util;
 
 import java.lang.ref.WeakReference;
@@ -78,6 +79,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         tvReadWriteMessage = findViewById(R.id.tv_read_write_message);
         tvContentMessage = findViewById(R.id.tv_content_message);
         initListView();
+
         findViewById(R.id.btn_send_one).setOnClickListener(this);
         findViewById(R.id.btn_send_two).setOnClickListener(this);
         lzPacket = LzPacket.getmInstance();
@@ -214,7 +216,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             }
         });
-        Intent startSrv = new Intent(this.getApplicationContext(), OnlineService.class);
+        Intent startSrv = new Intent(this.getApplicationContext(), UsbConnectService.class);
         this.getApplicationContext().startService(startSrv);
     }
 
@@ -257,7 +259,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if(!Settings.System.canWrite(this)){
                         requestWriteSettings();
                     }else {
-                        startActivity(new Intent(this, ItemActivity.class));
+//                        startActivity(new Intent(this, ItemActivity.class));
+                        startActivity(new Intent(this, ThreadActivity.class));
 
                     }
                 }
@@ -313,24 +316,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 return;
             }
             switch (intent.getAction()) {
-                case SerialService.ACTION_USB_PERMISSION_GRANTED: // USB PERMISSION GRANTED
+                case UsbConnectService.ACTION_USB_PERMISSION_GRANTED: // USB PERMISSION GRANTED
                     Util.runOnUiThread(() -> Util.showToast("USB Ready"));
                     break;
-                case SerialService.ACTION_USB_BL_PERMISSION_GRANTED:
+                case UsbConnectService.ACTION_USB_BL_PERMISSION_GRANTED:
                     break;
-                case SerialService.ACTION_USB_PERMISSION_NOT_GRANTED: // USB PERMISSION NOT GRANTED
+                case UsbConnectService.ACTION_USB_PERMISSION_NOT_GRANTED: // USB PERMISSION NOT GRANTED
                     Util.runOnUiThread(() -> Util.showToast("USB Permission not granted"));
                     break;
-                case SerialService.ACTION_NO_USB: // NO USB CONNECTED
+                case UsbConnectService.ACTION_NO_USB: // NO USB CONNECTED
                     Util.runOnUiThread(() -> Util.showToast("No USB connected"));
                     break;
-                case SerialService.ACTION_USB_DISCONNECTED: // USB DISCONNECTED
+                case UsbConnectService.ACTION_USB_DISCONNECTED: // USB DISCONNECTED
                     Util.runOnUiThread(() -> {
                         Util.showToast("USB disconnected");
                         tvTitle.setText("USB disconnected");
                     });
                     break;
-                case SerialService.ACTION_USB_NOT_SUPPORTED: // USB NOT SUPPORTED
+                case UsbConnectService.ACTION_USB_NOT_SUPPORTED: // USB NOT SUPPORTED
                     Util.runOnUiThread(() -> Util.showToast("USB device connect USB Storage"));
                     break;
             }
@@ -338,13 +341,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     };
     private boolean inUpdateMode;
     private MyHandler mHandler;
-    private SerialService serialService;
+    private UsbConnectService usbConnectService;
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-            serialService = ((SerialService.UsbBinder) arg1).getService();
-            serialService.setHandler(mHandler);
-            serialService.setiCallBack(device -> {
+            usbConnectService = ((UsbConnectService.UsbBinder) arg1).getService();
+            usbConnectService.setHandler(mHandler);
+            usbConnectService.setiCallBack(device -> {
                 LogUtils.i(device.toString());
                 Util.runOnUiThread(() -> {
                     tvTitle.setText(device.getDeviceName());
@@ -355,7 +358,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            serialService = null;
+            usbConnectService = null;
         }
     };
 
@@ -365,27 +368,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     public void onUsbResume() {
-        setFilters();  // Start listening notifications from SerialService
-        startService(SerialService.class, usbConnection, null); // Start SerialService(if it was not started before) and Bind it
+        setFilters();  // Start listening notifications from UsbConnectService
+        startService(UsbConnectService.class, usbConnection, null); // Start UsbConnectService(if it was not started before) and Bind it
     }
 
     public void onUsbPause() {
         unregisterReceiver(mUsbReceiver);
         unbindService(usbConnection);
-        stopService(new Intent(this, SerialService.class));
+        stopService(new Intent(this, UsbConnectService.class));
     }
 
     public void onUsbClose(boolean updateMode) {
         inUpdateMode = updateMode;
-        if (inUpdateMode && serialService != null) {
-            serialService.closeUsbDevice();
+        if (inUpdateMode && usbConnectService != null) {
+            usbConnectService.closeUsbDevice();
         }
     }
 
     private UsbDevice usbDevice;
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
-        if (!SerialService.SERVICE_CONNECTED) {
+        if (!UsbConnectService.SERVICE_CONNECTED) {
             Intent startService = new Intent(this, service);
             if (extras != null && !extras.isEmpty()) {
                 Set<String> keys = extras.keySet();
@@ -402,16 +405,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(SerialService.ACTION_USB_PERMISSION_GRANTED);
-        filter.addAction(SerialService.ACTION_NO_USB);
-        filter.addAction(SerialService.ACTION_USB_DISCONNECTED);
-        filter.addAction(SerialService.ACTION_USB_NOT_SUPPORTED);
-        filter.addAction(SerialService.ACTION_USB_PERMISSION_NOT_GRANTED);
+        filter.addAction(UsbConnectService.ACTION_USB_PERMISSION_GRANTED);
+        filter.addAction(UsbConnectService.ACTION_NO_USB);
+        filter.addAction(UsbConnectService.ACTION_USB_DISCONNECTED);
+        filter.addAction(UsbConnectService.ACTION_USB_NOT_SUPPORTED);
+        filter.addAction(UsbConnectService.ACTION_USB_PERMISSION_NOT_GRANTED);
         registerReceiver(mUsbReceiver, filter);
     }
 
     public void connectUsb() {
-        serialService.requestPermission();
+        usbConnectService.requestPermission();
     }
 
     private static class MyHandler extends Handler {
@@ -425,7 +428,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case SerialService.MESSAGE_FROM_SERIAL_PORT:
+                case UsbConnectService.MESSAGE_FROM_SERIAL_PORT:
                     byte[] bytes = (byte[]) msg.obj;
                     LogUtils.i("bytes " + ConvertUtil.bytesToHexString(bytes));
 
@@ -433,13 +436,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         iReadCallBack.onIReadCallBack(bytes);
                     }
                     break;
-                case SerialService.CTS_CHANGE:
+                case UsbConnectService.CTS_CHANGE:
                     Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "CTS_CHANGE", Toast.LENGTH_LONG).show());
                     break;
-                case SerialService.DSR_CHANGE:
+                case UsbConnectService.DSR_CHANGE:
                     Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "DSR_CHANGE", Toast.LENGTH_LONG).show());
                     break;
-                case SerialService.USB_CLASS_MASS_STORAGE:
+                case UsbConnectService.USB_CLASS_MASS_STORAGE:
                     Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "USB_CLASS_MASS_STORAGE", Toast.LENGTH_LONG).show());
                     break;
             }
@@ -451,12 +454,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     public void write(byte[] data, int off, int len) {
-        if (serialService != null) {
+        if (usbConnectService != null) {
             if (off == 0 && data.length == len) {
-                serialService.write(data);
+                usbConnectService.write(data);
             } else {
                 byte[] buff = Arrays.copyOfRange(data, off, len);
-                serialService.write(buff);
+                usbConnectService.write(buff);
             }
         }
     }

@@ -1,9 +1,9 @@
 package com.lz.serial.net;
 
-import net.qiujuer.library.clink.box.StringReceivePacket;
-import net.qiujuer.library.clink.core.Connector;
-import net.qiujuer.library.clink.core.Packet;
-import net.qiujuer.library.clink.core.ReceivePacket;
+import com.lz.base.clink.box.StringReceivePacket;
+import com.lz.base.clink.core.Connector;
+import com.lz.base.clink.core.Packet;
+import com.lz.base.clink.core.ReceivePacket;
 
 import java.io.File;
 import java.io.IOException;

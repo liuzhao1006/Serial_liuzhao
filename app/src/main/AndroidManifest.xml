@@ -38,8 +38,8 @@
     <uses-permission android:name="android.permission.US" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <!--用于申请调用A-GPS模块-->
-    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
+    <!-- 用于申请调用A-GPS模块 -->
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <!-- usb特性 -->
     <!-- 注释以调试 -->
     <uses-feature
@@ -57,39 +57,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         tools:ignore="AllowBackup">
-
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="4de7ceb608eb1dd622ed8febb8a8688e"/>
+            android:value="4de7ceb608eb1dd622ed8febb8a8688e" />
+
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service
-            android:name=".service.SerialService"
+            android:name=".service.UsbConnectService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".ItemActivity" />
+        <activity android:name=".ui.ItemActivity" />
 
         <service
-            android:name=".service.OnlineService"
+            android:name=".service.TcpConnectService"
             android:enabled="true"
             android:exported="true" />
 
         <activity android:name=".ui.ScanWifiActivity" />
-        <activity android:name=".ui.WifiConnectActivity">
+        <activity android:name=".ui.WifiConnectActivity"/>
 
+        <service android:name="com.amap.api.location.APSService" />
 
-        </activity>
-
-        <service android:name="com.amap.api.location.APSService"/>
+        <activity android:name=".ui.threader.ThreadActivity"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>
