@@ -5,11 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.threader.ThreadActivity">
+
     <Button
-        android:layout_width="40dp"
-        android:onClick="start"
         android:id="@+id/btn_start"
-        android:layout_height="40dp" />
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignStart="@+id/btn_forward"
+        android:layout_alignTop="@+id/et_ip"
+        android:layout_alignEnd="@+id/iv_video"
+        android:layout_marginEnd="154dp"
+        android:onClick="start"
+        android:text="获取ip" />
 
     <Button
         android:id="@+id/btn_forward"
@@ -26,6 +32,8 @@
         android:id="@+id/iv_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:scaleType="fitXY" />
 
     <com.lz.serial.widget.RockerView
@@ -80,5 +88,19 @@
         android:layout_toEndOf="@+id/btn_forward"
         android:onClick="rightTurn"
         android:text="右转" />
+
+    <EditText
+        android:id="@+id/et_ip"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/iv_video"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="316dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="192.168.1.100" />
 
 </RelativeLayout>

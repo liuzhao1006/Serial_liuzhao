@@ -101,7 +101,12 @@ public class LogUtils {
     public static void d(String message) {
         if (sLogEnable) {
             Log.d(LOG_LIUZHAO, message);
-            writeToFileIfNeeded(message, LogLevel.DEBUG,sLogFilesApp);
+            String[] log = message.split(LOG_LIUZHAO + ":");
+            if(log.length >= 2){
+                writeToFileIfNeeded(log[1], LogLevel.DEBUG, sLogFilesApp);
+            }else {
+                writeToFileIfNeeded(message, LogLevel.DEBUG, sLogFilesApp);
+            }
         }
     }
 
@@ -114,7 +119,12 @@ public class LogUtils {
     public static void w(String msg) {
         if (sLogEnable) {
             Log.w(LOG_LIUZHAO, msg);
-            writeToFileIfNeeded(msg, LogLevel.WARN, sLogFilesApp);
+            String[] log = msg.split(LOG_LIUZHAO + ":");
+            if(log.length >= 2){
+                writeToFileIfNeeded(log[1], LogLevel.WARN, sLogFilesApp);
+            }else {
+                writeToFileIfNeeded(msg, LogLevel.WARN, sLogFilesApp);
+            }
         }
     }
 
@@ -127,7 +137,12 @@ public class LogUtils {
     public static void e(String msg) {
         if (sLogEnable) {
             Log.e(LOG_LIUZHAO, msg);
-            writeToFileIfNeeded(msg, LogLevel.ERROR, sLogFilesApp);
+            String[] log = msg.split(LOG_LIUZHAO + ":");
+            if(log.length >= 2){
+                writeToFileIfNeeded(log[1], LogLevel.ERROR, sLogFilesApp);
+            }else {
+                writeToFileIfNeeded(msg, LogLevel.ERROR, sLogFilesApp);
+            }
         }
     }
 
@@ -140,7 +155,14 @@ public class LogUtils {
     public static void i( String msg) {
         if (sLogEnable) {
             Log.i(LOG_LIUZHAO, msg);
-            writeToFileIfNeeded(msg, LogLevel.INFO, sLogFilesApp);
+
+            String[] log = msg.split(LOG_LIUZHAO + ":");
+            if(log.length >= 2){
+                writeToFileIfNeeded(log[1], LogLevel.INFO, sLogFilesApp);
+            }else {
+                writeToFileIfNeeded(msg, LogLevel.INFO, sLogFilesApp);
+            }
+
         }
     }
     /**
@@ -152,7 +174,14 @@ public class LogUtils {
     public static void v( String msg) {
         if (sLogEnable) {
             Log.v(LOG_LIUZHAO, msg);
-            writeToFileIfNeeded( msg, LogLevel.VERBOSE,sLogFilesApp);
+
+            String[] log = msg.split(LOG_LIUZHAO + ":");
+            if(log.length >= 2){
+                writeToFileIfNeeded(log[1], LogLevel.VERBOSE, sLogFilesApp);
+            }else {
+                writeToFileIfNeeded(msg, LogLevel.VERBOSE, sLogFilesApp);
+            }
+
         }
     }
 
@@ -162,7 +191,7 @@ public class LogUtils {
             return;
         }
         sLogExecutor.execute(() -> {
-            String logMsg = formatLog( msg);
+            String logMsg = formatSimpleLog( msg);
             logFilesUtils.writeLogToFile(logMsg);
         });
     }
@@ -170,6 +199,9 @@ public class LogUtils {
     private static String formatLog( String msg) {
         return String.format(Locale.getDefault(),"%s pid=%d %s: %s\n", LOG_DATE_TIME_FORMAT.format(new Date(
                 System.currentTimeMillis())), android.os.Process.myPid(), LOG_LIUZHAO, msg);
+    }
+    private static String formatSimpleLog( String msg) {
+        return msg;
     }
 
 }

@@ -87,11 +87,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         lzPacket.registMessage(testMessage);
         //收到消息的地方.
         voltage.setIVoltage(msg -> Util.runOnUiThread(() -> {
-            Util.showToast("LzVoltage " + msg.toString());
+            //Util.showToast("LzVoltage " + msg.toString());
             LogUtils.i("LzVoltage " + msg.toString());
         }));
         testMessage.setIMessage(msg -> {
-            Util.showToast("LzTestMessage " + msg.toString());
+            //Util.showToast("LzTestMessage " + msg.toString());
             LogUtils.i("LzTestMessage " + msg.toString());
         });
 
@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.tv_read_message).setOnClickListener(view -> {
             byte[] b = {(byte) 0x5A, (byte) 0XA5,
                     (byte) 0X04, (byte) 0X83, (byte) 0X11, (byte) 0X01, (byte) 0X01};
-            Util.showToast(ConvertUtil.bytes2String(b));
+            //Util.showToast(ConvertUtil.bytes2String(b));
             write(b, 0, b.length);
         });
         //spinner
@@ -124,73 +124,73 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     case 0:
                         byte[] ledLight = LzUserOrder.getLedLight();
                         write(ledLight);
-                        Util.showToast(arr[position]+ position+ "  " + ConvertUtil.bytesToHexString(ledLight));
+                        //Util.showToast(arr[position]+ position+ "  " + ConvertUtil.bytesToHexString(ledLight));
                         break;
                     case 1:
                         byte[] pageId = LzUserOrder.getPageId();
                         write(pageId);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId));
+                        //Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId));
                         break;
                     case 2:
                         byte[] bytes = LzUserOrder.setLedLight(ConvertUtil.intToByte(setLedLight+=5));
                         write(bytes);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bytes));
+                        //Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bytes));
                         break;
                     case 3:
                         byte[] pageId3 = LzUserOrder.setPageId(ConvertUtil.intToByte(pageIds++));
                         write(pageId3);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId3));
+                        //Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(pageId3));
                         break;
                     case 4:
                         byte[] bz = LzUserOrder.setBuzzer((byte) 0x20);
                         write(bz);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bz));
+                        //Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(bz));
                         break;
                     case 5:
                         byte[] reset = LzUserOrder.setReset();
                         write(reset);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(reset));
+                        //Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(reset));
                         break;
                     case 6:
                         byte[] calibration = LzUserOrder.setCalibration();
                         write(calibration);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(calibration));
+                       // Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(calibration));
                         break;
                     case 7:
                         byte[] touch = LzUserOrder.setTouchFunction((byte) 0x00);
                         write(touch);
-                        Util.showToast(arr[position] + position + "  " + ConvertUtil.bytesToHexString(touch));
+                        //Util.showToast(arr[position] + position + "  " + ConvertUtil.bytesToHexString(touch));
                         break;
                     case 8:
                         byte[] time = LzUserOrder.setCurRtcTime();
                         write(time);
-                        Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(time));
+                       // Util.showToast(arr[position]+ position + "  " + ConvertUtil.bytesToHexString(time));
                         break;
                     case 9:
                         String popupWindow = tvReadWriteMessage.getText().toString().trim();
-                        LzUserOrder.setPopupWindow((byte)0x01);
+                       // LzUserOrder.setPopupWindow((byte)0x01);
                         break;
                     case 10:
                         byte[] color = LzUserOrder.setTextColor((byte) 0X82, ConvertUtil.intToByteArray(0xFFFF + 0x03), new byte[]{(byte) 0x82, (byte) 0x08});
                         write(color);
-                        Util.showToast(arr[position]);
+                       // Util.showToast(arr[position]);
                         break;
                     case 11:
                         byte[] setNumber = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x00}, 43);
                         write(setNumber);
-                        Util.showToast(arr[position]);
+                       // Util.showToast(arr[position]);
                         break;
                     case 12:
                         byte[] setNumber2 = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x01}, 55);
                         write(setNumber2);
-                        Util.showToast(arr[position]);
+                        //Util.showToast(arr[position]);
                         break;
                     case 13:
                         byte[] setNumber3 = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x00}, 60);
                         write(setNumber3);
                         byte[] setNumber4 = LzUserOrder.setNumbericIntType((byte) 0X82, new byte[]{(byte)0x10,(byte)0x01}, 61);
                         write(setNumber4);
-                        Util.showToast(arr[position]);
+                        //Util.showToast(arr[position]);
                         break;
                     case 14:
                         //菜单弹出
@@ -202,7 +202,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         //隐藏菜单
                         byte[] hide = LzUserOrder.hideDialog((byte)0x02);
                         write(hide);
-                        Util.showToast(arr[position]);
+                       // Util.showToast(arr[position]);
                         break;
                     case 16:
 
@@ -259,8 +259,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if(!Settings.System.canWrite(this)){
                         requestWriteSettings();
                     }else {
-//                        startActivity(new Intent(this, ItemActivity.class));
-                        startActivity(new Intent(this, ThreadActivity.class));
+                        startActivity(new Intent(this, ItemActivity.class));
+//                        startActivity(new Intent(this, ThreadActivity.class));
 
                     }
                 }
@@ -317,24 +317,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
             switch (intent.getAction()) {
                 case UsbConnectService.ACTION_USB_PERMISSION_GRANTED: // USB PERMISSION GRANTED
-                    Util.runOnUiThread(() -> Util.showToast("USB Ready"));
+                    //Util.runOnUiThread(() -> Util.showToast("USB Ready"));
                     break;
                 case UsbConnectService.ACTION_USB_BL_PERMISSION_GRANTED:
                     break;
                 case UsbConnectService.ACTION_USB_PERMISSION_NOT_GRANTED: // USB PERMISSION NOT GRANTED
-                    Util.runOnUiThread(() -> Util.showToast("USB Permission not granted"));
+                   // Util.runOnUiThread(() -> Util.showToast("USB Permission not granted"));
                     break;
                 case UsbConnectService.ACTION_NO_USB: // NO USB CONNECTED
-                    Util.runOnUiThread(() -> Util.showToast("No USB connected"));
+                   // Util.runOnUiThread(() -> Util.showToast("No USB connected"));
                     break;
                 case UsbConnectService.ACTION_USB_DISCONNECTED: // USB DISCONNECTED
-                    Util.runOnUiThread(() -> {
-                        Util.showToast("USB disconnected");
-                        tvTitle.setText("USB disconnected");
-                    });
+//                    Util.runOnUiThread(() -> {
+//                        Util.showToast("USB disconnected");
+//                        tvTitle.setText("USB disconnected");
+//                    });
                     break;
                 case UsbConnectService.ACTION_USB_NOT_SUPPORTED: // USB NOT SUPPORTED
-                    Util.runOnUiThread(() -> Util.showToast("USB device connect USB Storage"));
+//                    Util.runOnUiThread(() -> Util.showToast("USB device connect USB Storage"));
                     break;
             }
         }
@@ -349,10 +349,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             usbConnectService.setHandler(mHandler);
             usbConnectService.setiCallBack(device -> {
                 LogUtils.i(device.toString());
-                Util.runOnUiThread(() -> {
-                    tvTitle.setText(device.getDeviceName());
-//                    Util.showToast(device.toString());
-                });
+//                Util.runOnUiThread(() -> {
+//                    tvTitle.setText(device.getDeviceName());
+////                    Util.showToast(device.toString());
+//                });
             });
         }
 
@@ -437,13 +437,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     }
                     break;
                 case UsbConnectService.CTS_CHANGE:
-                    Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "CTS_CHANGE", Toast.LENGTH_LONG).show());
+                   // Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "CTS_CHANGE", Toast.LENGTH_LONG).show());
                     break;
                 case UsbConnectService.DSR_CHANGE:
-                    Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "DSR_CHANGE", Toast.LENGTH_LONG).show());
+                    //Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "DSR_CHANGE", Toast.LENGTH_LONG).show());
                     break;
                 case UsbConnectService.USB_CLASS_MASS_STORAGE:
-                    Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "USB_CLASS_MASS_STORAGE", Toast.LENGTH_LONG).show());
+                  //  Util.runOnUiThread(() -> Toast.makeText(mActivity.get(), "USB_CLASS_MASS_STORAGE", Toast.LENGTH_LONG).show());
                     break;
             }
         }

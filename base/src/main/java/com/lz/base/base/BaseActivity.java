@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 
 import com.lz.base.R;
 import com.lz.base.log.LogUtils;
+import com.lz.base.net.api.BaseNetApi;
 import com.lz.base.util.UiUtils;
 
 import java.lang.reflect.Method;

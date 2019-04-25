@@ -36,6 +36,8 @@
             android:textColor="@color/lz_text"
             android:textSize="16sp" />
 
+
+
     </LinearLayout>
 
 </LinearLayout>

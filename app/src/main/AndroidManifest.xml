@@ -64,6 +64,23 @@
         <activity
             android:name=".ui.MainActivity"
             android:windowSoftInputMode="stateHidden">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+
+        <service
+            android:name=".service.UsbConnectService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ui.ItemActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -73,24 +90,19 @@
         </activity>
 
         <service
-            android:name=".service.UsbConnectService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity android:name=".ui.ItemActivity" />
-
-        <service
             android:name=".service.TcpConnectService"
             android:enabled="true"
             android:exported="true" />
 
         <activity android:name=".ui.ScanWifiActivity" />
-        <activity android:name=".ui.WifiConnectActivity"/>
+        <activity android:name=".ui.WifiConnectActivity" />
 
         <service android:name="com.amap.api.location.APSService" />
 
-        <activity android:name=".ui.threader.ThreadActivity"
-            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".ui.threader.ThreadActivity"
+            android:screenOrientation="landscape"></activity>
+        <activity android:name=".ui.TestInfoActivity"></activity>
     </application>
 
 </manifest>

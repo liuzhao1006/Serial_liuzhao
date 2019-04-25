@@ -7,6 +7,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Build;
@@ -19,11 +21,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,9 +36,25 @@ import android.widget.Toast;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.huantansheng.easyphotos.EasyPhotos;
+import com.huantansheng.easyphotos.callback.SelectCallback;
+import com.huantansheng.easyphotos.models.album.entity.Photo;
 import com.lz.base.base.BaseActivity;
+import com.lz.base.clink.core.Connector;
+import com.lz.base.clink.core.IoContext;
+import com.lz.base.clink.core.ScheduleJob;
+import com.lz.base.clink.core.schedule.IdleTimeoutScheduleJob;
+import com.lz.base.clink.impl.IoSelectorProvider;
+import com.lz.base.clink.impl.SchedulerImpl;
+import com.lz.base.clink.utils.CloseUtils;
 import com.lz.base.log.LogUtils;
+import com.lz.base.net.FlowerManager;
+import com.lz.base.net.api.BaseNetApi;
+import com.lz.base.net.bean.FlowerInfoBean;
+import com.lz.base.util.PrefUtils;
+import com.lz.base.view.GlideEngine;
 import com.lz.base.view.dialog.AlertDialog;
+import com.lz.base.view.indicators.Utils;
 import com.lz.serial.R;
 import com.lz.serial.SerialApp;
 import com.lz.serial.fragment.bean.CDBean;
@@ -72,19 +92,13 @@ import com.lz.serial.widget.PopupWindowUtils;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
-import com.lz.base.clink.core.Connector;
-import com.lz.base.clink.core.IoContext;
-import com.lz.base.clink.core.ScheduleJob;
-import com.lz.base.clink.core.schedule.IdleTimeoutScheduleJob;
-import com.lz.base.clink.impl.IoSelectorProvider;
-import com.lz.base.clink.impl.SchedulerImpl;
-import com.lz.base.clink.utils.CloseUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -92,6 +106,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static com.lz.serial.net.Contracts.SAVE_IP;
+import static com.lz.serial.net.Contracts.SAVE_PORT;
 
 public class ItemActivity extends BaseActivity implements View.OnClickListener, TcpClient.ConnectorStatusListener {
     static final String[] LOCATIONGPS = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -123,6 +139,7 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
         iv = findViewById(R.id.iv_wifi_connect);
         iv.setOnClickListener(this);
         ivWifiStatus = findViewById(R.id.iv_wifi_status);
+
         ViewPager mViewPager = findViewById(R.id.view_pager5);
 
         MyMainAdapter adapter = new MyMainAdapter(getSupportFragmentManager(), mStrings);
@@ -197,7 +214,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
         locationClient.setLocationOption(locationOption);
         // 设置定位监听
         locationClient.setLocationListener(locationListener);
-
         startLocation();
     }
 
@@ -251,8 +267,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
         }
     }
 
-
-
     /**
      * 开始定位
      *
@@ -282,12 +296,7 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
         return R.layout.activity_item;
     }
 
-
-
-
-
     public void showDialog() {
-
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         builder.setTitle("WIFI扫描")
                 .setMessage("是否扫描wifi")
@@ -299,7 +308,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
 
                 }).setNegativeButton("NO", (dialogInterface, i) -> dialogInterface.dismiss())
         ;
-
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -311,10 +319,59 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 showPop();
                 break;
             case R.id.ll_location:
+//                getFlower();
+
                 dialog();
                 break;
         }
     }
+
+    private void getFlower() {
+        Log.i("flower","开始获取");
+        FlowerManager flowerManager = FlowerManager.getmInstance().setContext(SerialApp.getmContext()).setApi(new BaseNetApi() {
+            @Override
+            public void netStart() {
+
+            }
+
+            @Override
+            public void netStop() {
+
+            }
+
+            @Override
+            public void netSuccessed(int what, String data) {
+
+            }
+
+            @Override
+            public void netFailed(int what, String message) {
+                Util.showToast(message);
+            }
+        });
+
+        Log.i("flower","正在开始获取");
+        EasyPhotos.createAlbum(this, false, GlideEngine.getInstance()).start(new SelectCallback() {
+            @Override
+            public void onResult(ArrayList<Photo> photos, ArrayList<String> paths, boolean isOriginal) {
+                Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeFile(photos.get(0).path));
+                Log.i("flower","获取结果" + bitmap.toString());
+                flowerManager.getFlowerInfo(Utils
+                        .convertToBase64(Bitmap.createScaledBitmap(bitmap,
+                                500, 500, false)));
+
+            }
+        });
+        flowerManager.setOnFlowerInfoData((what, mList) -> {
+            StringBuilder sb = new StringBuilder();
+            for (FlowerInfoBean bean :
+                    mList) {
+                sb.append(bean.toString());
+            }
+            Util.showToast(sb.toString());
+        });
+    }
+
 
     @SuppressLint("InflateParams")
     private void showPop() {
@@ -322,17 +379,16 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
         utils.showPop(LayoutInflater.from(this).inflate(R.layout.popup_view, null));
         utils.toggleBright();
         utils.setListeners(listeners);
-
     }
 
     private PopupWindowUtils.OnClickListeners listeners = view -> {
         if (view.getId() == R.id.tv_scan) {
             showDialog();
-            utils.dismiss();
         } else if (view.getId() == R.id.tv_connect) {
-            connectWifi();
-            utils.dismiss();
+
+            dialogIP();
         }
+        utils.dismiss();
     };
 
     private void connectWifi() {
@@ -422,7 +478,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                     e.printStackTrace();
                 }
             }
-
         }
     }
 
@@ -435,11 +490,9 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 ivWifiStatus.setEnabled(true);
             }
         });
-
     }
 
     private void onNewMessageArrived(ConnectorInfo info) {
-
         switch (info.getMessgeType()) {
             case CF:
                 LogUtils.i("cf " + info.getValue());
@@ -469,12 +522,10 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 LogUtils.i("JCF " + info.getValue());
                 EventBus.getDefault().post(new JCFMessageEvent(info.getValue()));
                 break;
-
             case DJCF:
                 LogUtils.i("DJCF " + info.getValue());
                 EventBus.getDefault().post(new DCMessageEvent(info.getValue()));
                 break;
-
             case HHYC:
                 LogUtils.i("HHYC " + info.getValue());
                 EventBus.getDefault().post(new HHYCMessageEvent(info.getValue()));
@@ -492,10 +543,10 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 EventBus.getDefault().post(new RLPGMessageEvent(info.getValue()));
                 break;
             case ERROR:
-                runOnUiThread(() -> Toast.makeText(ItemActivity.this, info.getValue(), Toast.LENGTH_SHORT).show());
+                //runOnUiThread(() -> Toast.makeText(ItemActivity.this, info.getValue(), Toast.LENGTH_SHORT).show());
                 break;
             default:
-                runOnUiThread(() -> Toast.makeText(ItemActivity.this, info.getValue(), Toast.LENGTH_SHORT).show());
+                //runOnUiThread(() -> Toast.makeText(ItemActivity.this, info.getValue(), Toast.LENGTH_SHORT).show());
                 break;
         }
     }
@@ -540,7 +591,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 client.send("我来了, 你们颤抖吧!");
                 ScheduleJob job = new IdleTimeoutScheduleJob(Contracts.IDLE_TIMEOUT_SCHEDULE_JOB, TimeUnit.SECONDS, client);
                 client.schedule(job);
-
             } catch (IOException e) {
                 e.printStackTrace();
                 new DestroyAction().call();
@@ -562,7 +612,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                     ivWifiStatus.setEnabled(true);
                 }
             });
-
             if(timer != null){
                 timer.cancel();
                 timer = null;
@@ -572,7 +621,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 CloseUtils.close(client);
                 client = null;
             }
-
             try {
                 IoContext.close();
             } catch (IOException e) {
@@ -597,7 +645,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
             timer = null;
         }
     }
-
 
     private static final String NOTIFICATION_CHANNEL_NAME = "BackgroundLocation";
     private NotificationManager notificationManager = null;
@@ -631,7 +678,6 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 .setContentTitle(Util.getAppName(this))
                 .setContentText("正在后台运行")
                 .setWhen(System.currentTimeMillis());
-
         notification = builder.build();
         return notification;
     }
@@ -639,10 +685,8 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
 
     private void dialog() {
         View v = LayoutInflater.from(this).inflate(R.layout.dialog_location, null);
-
         tvLocationDialog = v.findViewById(R.id.tv_location_dialog);
         Button btnSureDialog = v.findViewById(R.id.btn_cancel_dialog);
-
         WindowManager manager = getWindowManager();
         int height = manager.getDefaultDisplay().getHeight();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -651,14 +695,54 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
                 .setWidthAndHeight(ViewGroup.LayoutParams.MATCH_PARENT, height)//屏幕的二分之一
                 .addDefaultAnimation()
                 .show();
-
         btnSureDialog.setOnClickListener(view -> builder.cancel());
     }
 
+    private void dialogIP() {
+        View v = LayoutInflater.from(this).inflate(R.layout.dialog_ip, null);
+        EditText et_ip_address = v.findViewById(R.id.et_ip_address);
+        EditText et_port_address = v.findViewById(R.id.et_port_address);
+        Button btnSureDialog = v.findViewById(R.id.btn_connect_tcp);
+        et_ip_address.setText(PrefUtils.getString(ItemActivity.this,SAVE_IP, "192.168.1.106"));
+        et_port_address.setText(PrefUtils.getString(ItemActivity.this,SAVE_PORT, "30401"));
+        WindowManager manager = getWindowManager();
+        int height = manager.getDefaultDisplay().getHeight();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setContentView(v)
+                .formBottom(true)
+                .setWidthAndHeight(ViewGroup.LayoutParams.MATCH_PARENT, height)//屏幕的二分之一
+                .addDefaultAnimation()
+                .show();
+        btnSureDialog.setOnClickListener(view -> {
+            if(client != null && client.isConnect()){
+                Util.showToast("服务连接成功");
+                return;
+            }
+            String ip = et_ip_address.getText().toString().trim();
+            String port = et_port_address.getText().toString().trim();
+            if(ip.length() > 15 || ip.length() < 7){
+                Util.showToast("ip地址有误");
+                builder.cancel();
+                return;
+            }else {
+                Contracts.IP = ip;
+            }
+            try {
+                Contracts.PORT = Integer.parseInt(port);
+            }catch (NumberFormatException e){
+                Util.showToast("端口地址有误");
+                builder.cancel();
+                return;
+            }
+            PrefUtils.putString(ItemActivity.this,SAVE_IP,ip);
+            PrefUtils.putString(ItemActivity.this,SAVE_PORT,port);
+            connectWifi();
+            builder.cancel();
+        });
+    }
 
     class MyMainAdapter extends FragmentPagerAdapter {
         private String[] mTabNames;
-
         public MyMainAdapter(FragmentManager fm,String[] info) {
             super(fm);
             mTabNames = info;
@@ -678,12 +762,10 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
         public int getCount() {
             return mTabNames.length;
         }
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationMessageEvent(LocationMessageEvent messageEvent) {
-        LogUtils.i("位置 " + messageEvent.getLocationMsg());
         if(tvLocationDialog != null){
             tvLocationDialog.setText(messageEvent.getLocationMsg());
         }
@@ -691,5 +773,4 @@ public class ItemActivity extends BaseActivity implements View.OnClickListener, 
             tvLocation.setText(messageEvent.getSimpleMsg());
         }
     }
-
 }

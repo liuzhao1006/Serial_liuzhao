@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">小车</string>
+    <string name="app_name">吉之龙</string>
     <string name="tv_title">Usb连接</string>
     <string name="tv_read_message">读取数据</string>
     <string name="tv_write_message">写入数据, 所有输入的内容均为十六进制</string>
@@ -85,6 +85,7 @@
     <string name="currentVoltage">当前电压</string>
     <string name="currentCurrent">当前电流</string>
     <string name="currentWorkingHours">当前工作时长</string>
+    <string name="setting_ip">设置IP地址</string>
 
 
 </resources>

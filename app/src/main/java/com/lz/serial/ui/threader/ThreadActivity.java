@@ -5,25 +5,32 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.lz.base.base.BaseActivity;
 import com.lz.base.log.LogUtils;
+import com.lz.base.socket.Constant;
 import com.lz.serial.R;
 import com.lz.serial.adapter.RevImageThread;
-import com.lz.serial.inter.ISendTcp;
 import com.lz.serial.service.TcpConnectService;
 import com.lz.serial.widget.RockerView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.lz.serial.net.Contracts.BACK_OFF;
+import static com.lz.serial.net.Contracts.BACK_OFF_LEFT_TURN;
+import static com.lz.serial.net.Contracts.BACK_OFF_RIGHT_TURN;
 import static com.lz.serial.net.Contracts.FORWARD;
+import static com.lz.serial.net.Contracts.FORWARD_LEFT_TURN;
+import static com.lz.serial.net.Contracts.FORWARD_RIGHT_TURN;
+import static com.lz.serial.net.Contracts.IP;
 import static com.lz.serial.net.Contracts.LEFT_TURN;
 import static com.lz.serial.net.Contracts.RIGHT_TURN;
 import static com.lz.serial.net.Contracts.STOP;
@@ -32,12 +39,12 @@ import static com.lz.serial.net.Contracts.VIDEO;
 public class ThreadActivity extends BaseActivity {
 
     ExecutorService executor;
-    private RockerView rockerView;
     private ImageView ivVideo;
     private RevImageThread revImageThread;
     private WorkThread thread;
-    private Thread control;
     private Direction mDirection;
+    private Direction mDirectionTemp;
+    private EditText etIp;
 
     @Override
     protected int getLayoutId() {
@@ -48,52 +55,52 @@ public class ThreadActivity extends BaseActivity {
     protected void initView(Bundle savedInstanceState) {
         Intent startSrv = new Intent(this.getApplicationContext(), TcpConnectService.class);
         this.getApplicationContext().startService(startSrv);
-        control = new Thread(new ControlThread());
-        control.start();
 
-        rockerView = findViewById(R.id.v_rocker);
+        RockerView rockerView = findViewById(R.id.v_rocker);
         ivVideo = findViewById(R.id.iv_video);
+        etIp = findViewById(R.id.et_ip);
+        IP = etIp.getText().toString().trim();
         rockerView.setCallBackMode(RockerView.CallBackMode.CALL_BACK_MODE_STATE_CHANGE);
         rockerView.setOnShakeListener(RockerView.DirectionMode.DIRECTION_8, new RockerView.OnShakeListener() {
             @Override
             public void onStart() {
                 LogUtils.i("onStart");
+
             }
 
             @Override
             public void direction(RockerView.Direction direction) {
                 mDirection = getDirection(direction);
-                Message msg = Message.obtain();
-                msg.arg1 = 1;
+                if(mDirection != mDirectionTemp ){
+                    circularTrans(mDirection);
+                    mDirectionTemp = mDirection;
+                }
             }
 
             @Override
             public void onFinish() {
                 LogUtils.i("onFinish");
+
+                circularTrans(Direction.STOP);
             }
         });
 
-        myHander = new MyHander();
+        myHandler = new MyHandler();
         executor = Executors.newSingleThreadExecutor();
-        revImageThread = new RevImageThread(myHander);
+        revImageThread = new RevImageThread(myHandler);
         thread = new WorkThread();
-
-
     }
-
-    private MyHander myHander;
+    private MyHandler myHandler;
 
     @Override
     public void initData() {
         super.initData();
-        myHander = new MyHander();
+        myHandler = new MyHandler();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        TcpConnectService service = new TcpConnectService();
-        setiSendTcp(service.getiSendTcp());
     }
 
     private Direction getDirection(RockerView.Direction direction) {
@@ -129,86 +136,72 @@ public class ThreadActivity extends BaseActivity {
 
     private Bitmap bitmap;
 
-    private ISendTcp iSendTcp;
-
-    public void setiSendTcp(ISendTcp iSendTcp) {
-        this.iSendTcp = iSendTcp;
-    }
-
-
-    private boolean isContinue = false;
-
     private enum Direction {
         STOP,
         FORWARD, BACK_OFF, LEFT_TURN, RIGHT_TURN,
-        FORWARD_LEFT_TURN, FORWARD_RIGHT_TURN, BACK_OFF_LEFT_TURN, BACK_OFF_RIGHT_TURN;
+        FORWARD_LEFT_TURN, FORWARD_RIGHT_TURN, BACK_OFF_LEFT_TURN, BACK_OFF_RIGHT_TURN,;
     }
 
     public void circularTrans(Direction direction) {
-        do {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             switch (direction) {
                 case FORWARD:
-                    send(FORWARD);
+                    EventBus.getDefault().post(new SportMessage(FORWARD));
                     break;
                 case BACK_OFF:
-                    send(BACK_OFF);
+                    EventBus.getDefault().post(new SportMessage(BACK_OFF));
                     break;
                 case LEFT_TURN:
-                    send(LEFT_TURN);
+                    EventBus.getDefault().post(new SportMessage(LEFT_TURN));
                     break;
                 case RIGHT_TURN:
-                    send(RIGHT_TURN);
+                    EventBus.getDefault().post(new SportMessage(RIGHT_TURN));
+                    break;
+                case BACK_OFF_LEFT_TURN:
+                    EventBus.getDefault().post(new SportMessage(BACK_OFF_LEFT_TURN));
+                    break;
+                case FORWARD_RIGHT_TURN:
+                    EventBus.getDefault().post(new SportMessage(FORWARD_RIGHT_TURN));
+                    break;
+                case FORWARD_LEFT_TURN:
+                    EventBus.getDefault().post(new SportMessage(FORWARD_LEFT_TURN));
+                    break;
+                case BACK_OFF_RIGHT_TURN:
+                    EventBus.getDefault().post(new SportMessage(BACK_OFF_RIGHT_TURN));
+                    break;
+                case STOP:
+                    EventBus.getDefault().post(new SportMessage(STOP));
                     break;
                 default:
-                    send(STOP);
+                    EventBus.getDefault().post(new SportMessage(STOP));
                     break;
             }
             LogUtils.i("小车运动会:" + mDirection);
-        } while (isContinue);
-
-        LogUtils.i("小车运动会,结束:" + mDirection + " " + isContinue);
     }
-
-
-    private void send(String msg) {
-        if (iSendTcp != null) {
-            iSendTcp.send(msg);
-            LogUtils.i("发送指令:  " + msg);
-        }
-    }
-
 
     public void leftTurn(View view) {
-        send(LEFT_TURN);
+        EventBus.getDefault().post(new SportMessage(LEFT_TURN));
     }
 
     public void rightTurn(View view) {
-        send(RIGHT_TURN);
+        EventBus.getDefault().post(new SportMessage(RIGHT_TURN));
     }
 
     public void forward(View view) {
-        send(FORWARD);
+        EventBus.getDefault().post(new SportMessage(FORWARD));
     }
 
     public void backOff(View view) {
-        send(BACK_OFF);
-
+        EventBus.getDefault().post(new SportMessage(BACK_OFF));
     }
 
-    public class MyHander extends Handler {
+    @SuppressLint("HandlerLeak")
+    public class MyHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-
             if (msg.what == VIDEO) {
                 bitmap = (Bitmap) msg.obj;
             }
-
             Log.i("car handleMessage", msg.what + "");
             ivVideo.setImageBitmap(bitmap);
             super.handleMessage(msg);
@@ -218,11 +211,8 @@ public class ThreadActivity extends BaseActivity {
     boolean isRunning = false;
 
     public void start(View view) {
-        if(!thread.isAlive()){
-            isRunning = true;
-            thread.start();
-        }
-
+        IP = etIp.getText().toString().trim();
+        EventBus.getDefault().post(new ConnectTcp(IP));
     }
 
     @Override
@@ -232,39 +222,12 @@ public class ThreadActivity extends BaseActivity {
     }
 
     public void stop() {
-//        vv.stopPlayback();
         isRunning = false;
         executor.shutdown();
     }
 
-    class ControlThread implements Runnable{
-        Handler handler = null;
-
-        @SuppressLint("HandlerLeak")
-        @Override
-        public void run() {
-
-            Looper.prepare();
-            handler = new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
-                    if(msg.arg1 == 1){
-                        circularTrans(mDirection);
-                        isContinue = mDirection != Direction.STOP;
-                    }
-                }
-            };
-            Looper.loop();
-        }
-
-    }
-
     class WorkThread extends Thread {
 
-        public WorkThread() {
-
-        }
 
         @Override
         public void run() {

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.lz.base.log.LogUtils;
+import com.lz.base.net.HttpInit;
 import com.lz.base.util.CrashHandler;
 
 
@@ -27,12 +28,10 @@ public class SerialApp extends Application {
         super.onCreate();
         mContext = getApplicationContext();
         CrashHandler.getInstance().init(getApplicationContext());
-
 //        LogcatHelper.getInstance(this).start();
-        LogUtils.i("应用程序启动了！！！");
-
+        //LogUtils.i("应用程序启动了！！！");
+        HttpInit.init(getApplicationContext());
         handler = new Handler();
-
         mainThreadId = android.os.Process.myTid();
 
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

@@ -138,8 +138,7 @@ public class WifiUtils {
             mWifiManager.removeNetwork(tempConfig.networkId);
         }
 
-        if (Type == 1) // WIFICIPHER_NOPASS
-        {
+        if (Type == 1) {
             config.wepKeys[0] = "";
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             config.wepTxKeyIndex = 0;

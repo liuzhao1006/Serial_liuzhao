@@ -2,19 +2,20 @@ package com.lz.serial.ui;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lz.base.base.BaseActivity;
+import com.lz.base.log.LogUtils;
+import com.lz.base.util.ConvertUtil;
 import com.lz.serial.R;
+import com.lz.serial.utils.Util;
 import com.lz.serial.utils.WifiUtils;
 
 public class WifiConnectActivity extends BaseActivity implements View.OnClickListener {
@@ -22,22 +23,20 @@ public class WifiConnectActivity extends BaseActivity implements View.OnClickLis
 
     private Button connect_btn;
     private TextView wifi_ssid_tv;
-    private EditText wifi_pwd_tv;
     private WifiUtils mUtils;
     // wifi之ssid
     private String ssid;
-    private String pwd;
     private ProgressDialog progressdlg = null;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case 0:
-                    showToast("WIFI连接成功");
+                    Util.showToast("WIFI连接成功");
                     finish();
                     break;
                 case 1:
-                    showToast("WIFI连接失败");
+                    Util.showToast("WIFI连接失败");
                     break;
 
             }
@@ -87,9 +86,8 @@ public class WifiConnectActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void findViews() {
-        this.connect_btn = (Button) findViewById(R.id.connect_btn);
-        this.wifi_ssid_tv = (TextView) findViewById(R.id.wifi_ssid_tv);
-        this.wifi_pwd_tv = (EditText) findViewById(R.id.wifi_pwd_tv);
+        this.connect_btn = findViewById(R.id.connect_btn);
+        this.wifi_ssid_tv = findViewById(R.id.wifi_ssid_tv);
     }
 
     private void setLiteners() {
@@ -99,41 +97,45 @@ public class WifiConnectActivity extends BaseActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.connect_btn) {// 下一步操作
-            pwd = wifi_pwd_tv.getText().toString();
-            // 判断密码输入情况
-            if (TextUtils.isEmpty(pwd)) {
-                Toast.makeText(this, "请输入wifi密码", Toast.LENGTH_SHORT).show();
+            //获取密码.
+            int intPwd;
+            try {
+                intPwd = Integer.parseInt(ssid.substring(2));
+            }catch (NumberFormatException e){
+                Util.showToast("wifi连接有误,请重新连接");
                 return;
             }
+
+            if(intPwd == 0){
+                Util.showToast("wifi连接有误,请重新连接");
+                return;
+            }
+            String hexPwd = ConvertUtil.intToHex(intPwd);
+            LogUtils.i("网络连接:账号 " + ssid + " 密码 " + hexPwd);
             progressDialog();
             // 在子线程中处理各种业务
-            dealWithConnect(ssid, pwd);
+            dealWithConnect(ssid, hexPwd);
         }
     }
 
     private void dealWithConnect(final String ssid, final String pwd) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                // 检验密码输入是否正确
-                boolean pwdSucess = mUtils.connectWifiTest(ssid, pwd);
-                try {
-                    Thread.sleep(4000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (pwdSucess) {
-                    mHandler.sendEmptyMessage(0);
-                } else {
-                    mHandler.sendEmptyMessage(1);
-                }
+        new Thread(() -> {
+            Looper.prepare();
+            // 检验密码输入是否正确
+            boolean pwdSucess = mUtils.connectWifiTest(ssid, pwd);
+            try {
+                Thread.sleep(4000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (pwdSucess) {
+                mHandler.sendEmptyMessage(0);
+            } else {
+                mHandler.sendEmptyMessage(1);
             }
         }).start();
     }
 
-    private void showToast(String str) {
-        Toast.makeText(WifiConnectActivity.this, str, Toast.LENGTH_SHORT).show();
-    }
+
 
 }

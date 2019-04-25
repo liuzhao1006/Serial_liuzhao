@@ -16,15 +16,22 @@ import com.lz.serial.inter.ISendTcp;
 import com.lz.serial.net.ConnectorInfo;
 import com.lz.serial.net.Contracts;
 import com.lz.serial.net.TcpClient;
+import com.lz.serial.ui.threader.ConnectTcp;
+import com.lz.serial.ui.threader.SportMessage;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import static com.lz.serial.net.Contracts.LEFT_TURN;
+import static com.lz.serial.net.Contracts.STOP;
 
 public class TcpConnectService extends Service implements TcpClient.ConnectorStatusListener,ISendTcp {
 
@@ -32,24 +39,18 @@ public class TcpConnectService extends Service implements TcpClient.ConnectorSta
     public TcpConnectService() {
     }
     private TcpClient client;
-    private int startId;
-
-    public ISendTcp getiSendTcp() {
-        return this;
-    }
-
 
 
     @Override
     public void onConnectorClosed(Connector connector) {
         LogUtils.i("Connetor " + connector.getKey());
-
     }
 
     @Override
     public void send(String msg) {
         if(client != null && msg != null){
             client.send(msg);
+            LogUtils.i("TcpConnectService send() = " + msg);
         }
     }
 
@@ -60,23 +61,34 @@ public class TcpConnectService extends Service implements TcpClient.ConnectorSta
     @Override
     public void onCreate() {
         super.onCreate();
-
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        this.startId = startId;
-        connectWifi();
-        LogUtils.i("onStartCommand开始连接");
+
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSportMessageEvent(SportMessage sportMessage) {
+        if(client != null && sportMessage.msg != null){
+            client.send(sportMessage.msg);
+            LogUtils.i("TcpConnectService send() = " + sportMessage.msg);
+        }
+    }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnectTcpEvent(ConnectTcp connectTcp) {
+        LogUtils.i("onConnectTcpEvent send() = " + connectTcp.ip);
+        connectWifi();
+        LogUtils.i("onStartCommand开始连接");
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -116,9 +128,10 @@ public class TcpConnectService extends Service implements TcpClient.ConnectorSta
                 client = new TcpClient(Contracts.IP, Contracts.PORT);
                 client.setMessageArrivedListener(mMessageArrivedListener);
                 client.setConnectorStatusListener(TcpConnectService.this);
-                client.send(LEFT_TURN);
+                client.send(STOP);
                 ScheduleJob job = new IdleTimeoutScheduleJob(Contracts.IDLE_TIMEOUT_SCHEDULE_JOB, TimeUnit.SECONDS, client);
                 client.schedule(job);
+                LogUtils.i("服务器名称: " + client.getServerName());
 
             } catch (IOException e) {
                 e.printStackTrace();

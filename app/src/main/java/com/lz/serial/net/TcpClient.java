@@ -63,10 +63,10 @@ public class TcpClient extends Connector {
     @Override
     protected void onReceivedPacket(ReceivePacket packet) {
         super.onReceivedPacket(packet);
-        LogUtils.i("onReceivedPacket连接了," + packet.entity());
+        //LogUtils.i("onReceivedPacket连接了," + packet.entity());
         if (packet.type() == Packet.TYPE_MEMORY_STRING) {
             String entity = ((StringReceivePacket) packet).entity();
-            LogUtils.i(entity);
+            LogUtils.i("onReceivedPacket "+entity);
             ConnectorInfo info = new ConnectorInfo(entity);
             mMessageArrivedListener.onNewMessageArrived(info);
         }
